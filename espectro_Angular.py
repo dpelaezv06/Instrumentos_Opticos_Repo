@@ -1,40 +1,62 @@
-''' CODIGO CON LAS FUNCIONES PARA CALCULAR DIFRACCION POR ESPECTRO ANGULAR 
-Aca estan todas las funciones relativas a la difraccion por espectro angular  '''
+''' CODIGO PARA MOSTRAR LA DIFRACCIÓN POR ESPECTRO ANGULAR'''
+
+''' Comentario temporal para acordarme de los pasos necesarios a realizar para la implementación
+de la dufracción por espectro Angular
+0 Definir los delta espaciales y frecuenciales que se utilizarán - Estos productos espacio frecuencia se pueden hallar con: from puntos_Mascaras import producto_EspacioFrecuencia [intervalo, resolucion]
+1 Generar U[n,m,0] - Este campo se va a generar a través de las funciones contenidas en puntos_Mascaras
+2 Calcular A[p,q,0] - Este cálculo será realizado a través de la función espectro_Fuente, la cuál retorna el espectro de U(n,m,0)
+3 Calcular A[p,q,z] - esta función se calcula con una multiplicación sencilla entre un término propagante y A[p,q,0]
+4
+5 '''
+
 
 ''' LIBRERIAS USADAS EN EL CODIGO '''
 import numpy as np #numpy para usar funciones matematicas
 import scipy as sc #scipy para obtener constantes cientificas
-import matplotlib.pyplot as plt #matplotlib para graficar funciones 
-
-''' 1. Tomar el espectro de fourier de la fuente 
-    2. Propago usando helmholtz 
-    3. Saco la distribucion de campo optico usando Fourier inversa'''
-
+import matplotlib.pyplot as plt #matplotlib para graficar funciones
+import puntos_Mascaras as pts
 
 ''' FUNCIONES UTILES PARA SACAR FRECUENCIAS DEPENDIENDO DE LOS PARAMETROS DE MUESTREO ...
 
 ########################## CUIDADO!!!!! SOLO FUNCIONA CON VENTANAS CUADRADAS Y MUESTREOS UNIFORMES #######################'''
 
+#PARÁMETROS PARA LA DIFRACCIÓN POR ESPECTRO ANGULAR TODILLO EN mm
 
-def frecuencias_Intervalos(intervalo, puntos, longitud_Onda): #funcion que retorna los datos de las frecuencias de muestreo de espacio y frecuencia usando el producto espacio-frecuencia
-    deltas_Intervalos = {"delta_Desplazamiento", 0, #en este diccionario se almacenan los datos de delta espacio y frecuencia
-                         "delta_Frecuencia", 0,
-                         "longitud_Onda", 0}
-    
-    deltas_Intervalos["delta_Desplazamiento"] = (intervalo[1] - intervalo[0]) / puntos #calculo la frecuencia de muestreo en el espacio como dr = L/N
-    deltas_Intervalos["delta_Frecuencia"] = 1 / (puntos * deltas_Intervalos["delta_Desplazamiento"]) #calculo la frecuencia de muestreo en las frecuencias usando el producto espacio-frecuencia dfdr=1/N
-    deltas_Intervalos["longitud_Onda"] = longitud_Onda #almaceno la longitud de onda en el diccionario, es bueno ternerla en facil acceso por efectos practicos
+longitud_onda = 632.8e-6                                #longitud de onda de un Láser de He-Ne
+numero_onda = 2*np.pi/longitud_onda
+ventana = 20                                            #Ventana de 5cm
+resolucion = 3000                                       #1024 puntos
+radio = 1                                               #Radio de 1.5mm para el círculo 
+Distancia_z = 10                                       #Distancia al plano de observación
 
-    return deltas_Intervalos #devuelvo el diccionario con los deltas de cada muestreo en cada espacio y la longitud de onda para escalar todo
+'''Funciones para calcular la difracción '''
+deltas = pts.producto_EspacioFrecuencia(ventana, resolucion)                                #Regresa los delta espacio, frecuencia en un diccionario
+X_in, Y_in = pts.malla_Puntos(resolucion, ventana)                                          #Se prepara una malla de puntos para la máscara
+X_espectre, Y_espectre = pts.malla_Puntos(resolucion, resolucion*deltas["Delta_F"])
+mascara = pts.funcion_Circulo(radio, None, X_in,Y_in)                                       #Se crea la mascara de un círculo, este va a ser el Campo U[x,y,0] de entrada
+espectro_0 = (deltas["Delta_X"]**2) * np.fft.fft2(mascara)                                 #Se calcusla A[x,y,0]
+termino_propagante = np.exp(1j*Distancia_z*numero_onda*np.sqrt(1-((longitud_onda**2) * ((X_espectre**2) + (Y_espectre**2)))))
+espectro_propagante = espectro_0 * termino_propagante        #Calculamos el espectro A[x,y,z]
+Campo_Propagante = (deltas["Delta_F"]**2) * np.fft.ifft2(espectro_propagante) #Calculamos el campo U[x,y,z] y lo shifteamos
+intensidad_Salida = np.abs(Campo_Propagante)**2
 
-def espectro_Fuente (fuente): #funcion que calcula el espectro de fourier de una fuente 
-    transformada = np.fft.fft2(fuente) #calculo el espectro
-    espectro = np.fft.fftshift(transformada) #shifteo para que las frecuencias bajas me queden al centro
-    return espectro # retorno el espectro
+''' GRAFICAS '''
+fig, axes = plt.subplots(1, 2, figsize=(12, 6))  # Crear dos subgráficos (uno para el plano de abertura y otro para el plano de salida)
 
-def espectro_Pantalla(espectro_Fuente, distancia, longitud_Onda, delta_F): 
-        
-    exponente = 1j * distancia * np.sqrt(1 - ((longitud_Onda * delta_F)**2) * )
+# Gráfico del plano de la abertura
+im_entrada = axes[0].imshow(mascara, extent=[X_in[0, 0], X_in[0, -1], Y_in[0, 0], Y_in[-1, 0]], cmap='gray', vmin=0, vmax=np.max(mascara))
+axes[0].set_title("Plano de la Abertura")
+axes[0].set_xlabel("x (mm)")
+axes[0].set_ylabel("y (mm)")
+fig.colorbar(im_entrada, ax=axes[0], label="Intensidad")  # Barra de color para el plano de la abertura
 
+# Gráfico del plano de difracción
+im_salida = axes[1].imshow(intensidad_Salida, extent=[X_in[0, 0], X_in[0, -1], Y_in[0, 0], Y_in[-1, 0]], cmap='gray', vmin=0, vmax=np.max(intensidad_Salida))
+axes[1].set_title("Plano de Difracción")
+axes[1].set_xlabel("x' (mm)")
+axes[1].set_ylabel("y' (mm)")
+fig.colorbar(im_salida, ax=axes[1], label="Intensidad")  # Barra de color para el plano de difracción
 
-
+# Mostrar ambas gráficas
+plt.tight_layout()
+plt.show()

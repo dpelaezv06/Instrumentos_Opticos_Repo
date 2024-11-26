@@ -31,7 +31,7 @@ numero_Onda = 2*np.pi / longitud_Onda       #numero de onda
 fase_ParabolicaEntrada = np.exp(1j * (numero_Onda / (2 * distancia_Propagacion)) * ((xx_Entrada ** 2) + (yy_Entrada **2))) #calculo de a fase parabolica para multiplicar la transmitancia antes de aplicar FFT
 fase_Constante = ((np.exp(1j * numero_Onda * distancia_Propagacion)) / (1j * longitud_Onda * distancia_Propagacion)) #calculo de la fase constante para multiplicar la FFT y obtener el campo de salida
 
-''' calculo de las coordenadas del plano de salida usando el prodducto eespacio frecuencia modificado para la transformada de fresnel '''
+''' calculo de las coordenadas del plano de salida usando el producto espacio frecuencia modificado para la transformada de fresnel '''
 deltas_Espacio = producto_EspacioFrecuenciaFresnel(longitud_Onda, distancia_Propagacion, ventana, resolucion) #calculamos los deltas del producto espacio frecuencia del 
 longitud_VentanaSalida = resolucion * deltas_Espacio["delta_Llegada"]
 xx_Salida, yy_Salida = pts.malla_Puntos(resolucion, longitud_VentanaSalida)

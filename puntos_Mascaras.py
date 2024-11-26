@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from PIL import Image
 
 ''' EN ESTE ARCHIVO SE ALMACCENAN ALGUNAS FUNCIONES QUE SON UTILES EN TODOS LOS MODELOS DE DIFRACCION, INDEPENDIENTEMENTE DE CUAL SE ESTE USANDO'''
 
@@ -65,3 +66,8 @@ def producto_EspacioFrecuencia (intervalo, resolucion): #funcion que saca los in
     deltas = {"Delta_X": deltax, "Delta_F": deltaf} #agregamos los deltas a una lista
     return deltas #retornamos el diccionario con los deltas
 
+def insertar_imagen( image_path , resolucion):
+    imagen = Image.open(image_path).convert("L")      #Asignamos la imagen a una variable y convertimos a RGB ("L")
+    imagen = imagen.resize((resolucion,resolucion))   #Redimesionamos la imagen
+    malla_imagen = np.array(imagen)                   #Creamos la malla para la difracción
+    return np.where(malla_imagen > 128 , 1, 0)        #Normalizamos la malla a blancos y negros, usando 128 como el color medio en RGB
