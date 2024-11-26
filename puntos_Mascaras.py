@@ -62,6 +62,6 @@ def producto_EspacioFrecuencia (intervalo, resolucion): #funcion que saca los in
     
     deltax = intervalo / resolucion #calculo del delta de espacio
     deltaf = 1 / (deltax *resolucion) #calculo del delta de frecuencias usando el producto espacio-frecuencias
-    deltas = {("Delta_X", deltax), ("Delta_F", deltaf)} #agregamos los deltas a una lista
+    deltas = {"Delta_X": deltax, "Delta_F": deltaf} #agregamos los deltas a una lista
     return deltas #retornamos el diccionario con los deltas
 
