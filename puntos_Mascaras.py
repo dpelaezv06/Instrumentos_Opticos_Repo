@@ -51,6 +51,15 @@ def funcion_Rectangulo(base, altura, centro, xx, yy): #funcion para realizar una
     return mascara #retorno la mascara
 
 def producto_EspacioFrecuencia (intervalo, resolucion): #funcion que saca los intervalos relativos al producto espacio frecuencia y devuelve los deltas de espacio y de frecuencia
+    ''' FUNCION QUE RETORNA LOS DELTA ESPACIO Y DELTA FRECUENCIA PARA UN MUESTREO EN PARTICULAR.
+
+    ATENCION!!!!!!!!!!  ESTA FUNCION ASUME QUE SE ESTAN USANDO MUESTREOS UNIFORMES TANTO EN X COMO EN Y, DE LA MISMA LONGITUD DE INTERVALO Y NUMERO DE PUNTOS EN 
+    AMBAS DIRECCIONES
+     
+        ENTRADAS:
+        intervalo == longitud fisica del intervalo del arreglo
+        resolucion == numero de puntos que tiene la malla del arreglo '''
+    
     deltax = intervalo / resolucion #calculo del delta de espacio
     deltaf = 1 / (deltax *resolucion) #calculo del delta de frecuencias usando el producto espacio-frecuencias
     deltas = {("Delta_X", deltax), ("Delta_F", deltaf)} #agregamos los deltas a una lista
