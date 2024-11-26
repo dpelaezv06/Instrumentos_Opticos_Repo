@@ -1,9 +1,9 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-''' Definicion de las difefrentes funciones de transmitancia'''
+''' EN ESTE ARCHIVO SE ALMACCENAN ALGUNAS FUNCIONES QUE SON UTILES EN TODOS LOS MODELOS DE DIFRACCION, INDEPENDIENTEMENTE DE CUAL SE ESTE USANDO'''
 
-def malla_Puntos(resolucion, longitud_Arreglo):
+def malla_Puntos(resolucion, longitud_Arreglo): #funcion que crea mallas de puntos 
     ''' CREACION DE LAS MALLAS DE PUNTOS Y LOS DELTAS PARA LOS PRODUCTOS ESPACIO FRECUENCIA '''
     x = np.linspace(-longitud_Arreglo / 2, longitud_Arreglo / 2, resolucion) #crea las mallas de puntos para el arreglo 
     y = np.linspace(-longitud_Arreglo / 2, longitud_Arreglo / 2, resolucion) 
@@ -11,8 +11,14 @@ def malla_Puntos(resolucion, longitud_Arreglo):
     return xx, yy #retornamos la malla de puntos
 
 
-def funcion_Circulo(radio, centro, xx, yy): #definicion de la funcion para hacer circulo transparente
-    ''' CREACCION DEL CONJUNTO DE PUNTOS DE LA MASCARA DE DFRACCION '''
+def funcion_Circulo(radio, centro, xx, yy): #definicion de la funcion para hacer un circulo transparente en una malla ded puntos
+    ''' CREACCION DEL CONJUNTO DE PUNTOS DE LA MASCARA DE DFRACCION 
+
+        ENTRADAS:
+        radio == radio de circunferencia
+        centro == array con las coordenadas espaciales del centro de la circunferencia
+        xx, yy == malla de puntos bidimensional en la cual se crea la circunferencia'''
+    
     if centro is None: # que pasa si el centro no es definido en la funcion
         centro = [0, 0] #ubica el centro de la circunferencia en el origen
     distancia = (xx - centro[0])**2 + (yy - centro[1])**2 #calculamos la distancia desde el centro de la circunferencia a cada punto
@@ -20,6 +26,14 @@ def funcion_Circulo(radio, centro, xx, yy): #definicion de la funcion para hacer
     return mascara #devolvemos los puntos que cumplen la condicion para hacer parte de la mascara
 
 def funcion_Rectangulo(base, altura, centro, xx, yy): #funcion para realizar una funcion rectangulo
+    ''' CREACION DE UN CONJUNTO DE PUNTOS QUE HACEN UNA ABERTURA RECTANGULAR
+     
+      ENTRADAS:
+        base == longitud de la base del rectangulo
+        altura == longitud de la altura del rectangulo
+        centro == array con las coordenadas espaciales del centro del rectangulo
+        xx, yy == malla de puntos bidimensional en la cual se crea el rectangulo '''
+
     if centro is None: #que es lo que pasa si no se especifica el centro del rectangulo
         centro = [0, 0] #el centro se ubicca por defecto en el origen
     x_Min = centro[0] - base / 2 #calculos de las distancias limite del rectangulo
@@ -31,9 +45,9 @@ def funcion_Rectangulo(base, altura, centro, xx, yy): #funcion para realizar una
 
     return mascara #retorno la mascara
 
-def producto_EspacioFrecuencia (intervalo, resolucion):
-    deltax = intervalo / resolucion #calculo del delta x
-    deltaf = 1 / (deltax *resolucion) #calculo del delta de frecuencias usaando el producto espacio-frecuencias
+def producto_EspacioFrecuencia (intervalo, resolucion): #funcion que saca los intervalos relativos al producto espacio frecuencia y devuelve los deltas de espacio y de frecuencia
+    deltax = intervalo / resolucion #calculo del delta de espacio
+    deltaf = 1 / (deltax *resolucion) #calculo del delta de frecuencias usando el producto espacio-frecuencias
     deltas = {("Delta_X", deltax), ("Delta_F", deltaf)} #agregamos los deltas a una lista
     return deltas #retornamos el diccionario con los deltas
 
