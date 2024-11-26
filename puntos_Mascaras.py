@@ -4,7 +4,12 @@ import matplotlib.pyplot as plt
 ''' EN ESTE ARCHIVO SE ALMACCENAN ALGUNAS FUNCIONES QUE SON UTILES EN TODOS LOS MODELOS DE DIFRACCION, INDEPENDIENTEMENTE DE CUAL SE ESTE USANDO'''
 
 def malla_Puntos(resolucion, longitud_Arreglo): #funcion que crea mallas de puntos 
-    ''' CREACION DE LAS MALLAS DE PUNTOS Y LOS DELTAS PARA LOS PRODUCTOS ESPACIO FRECUENCIA '''
+    ''' CREACION DE LAS MALLAS DE PUNTOS 
+        
+        ENTRARDAS:
+        resolucion == numero de puntos que conforman la malla
+        longitud_Arreglo == longitud fisica del arreglo, es una correspondencia con longitudes reales en el espacio'''
+    
     x = np.linspace(-longitud_Arreglo / 2, longitud_Arreglo / 2, resolucion) #crea las mallas de puntos para el arreglo 
     y = np.linspace(-longitud_Arreglo / 2, longitud_Arreglo / 2, resolucion) 
     xx, yy = np.meshgrid(x, y) #crea una malla de puntos bidimensional 
