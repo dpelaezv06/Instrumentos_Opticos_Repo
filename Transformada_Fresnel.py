@@ -21,10 +21,10 @@ longitud_Onda = 533E-9          #longitud de onda a utilizar
 distancia_Propagacion = 0.2     #distancia entre plano de mascara y plano de observacion
 
 #Relativas a la malla de puntos y la disposicion de la mascara
-ventana = 0.05
-resolucion = 2040
+ventana = 0.15
+resolucion = 6000
 xx_Entrada, yy_Entrada = pts.malla_Puntos(resolucion, ventana)
-mascara = pts.funcion_Circulo(1.5E-3, None, xx_Entrada, yy_Entrada)
+mascara = pts.funcion_Rectangulo(3E-3,3E-3,None,xx_Entrada,yy_Entrada)
 
 ''' Calculo de los terminos que intervienen en el modelo de difraccion por transformada de fresnel '''
 numero_Onda = 2*np.pi / longitud_Onda       #numero de onda
@@ -42,7 +42,7 @@ fase_ParabolicaSalida = np.exp((1j * (numero_Onda / 2 * distancia_Propagacion) *
 ''' operaciones para obtener el campo de salida '''
 campo_EntradaParabolico = mascara * fase_ParabolicaEntrada #preparamos el campo de entrada para meterlo a la fft
 campo_SalidaSinEscalar = np.fft.fft2(campo_EntradaParabolico) #calculamos la fft del campo de entrada multiplicado por la fase parabolica
-campo_Salida = np.fft.fftshift((deltas_Espacio["delta_Salida"] ** 2) * fase_Constante * fase_ParabolicaSalida * campo_SalidaSinEscalar) #escalamos el campo de salida con las constantes
+campo_Salida = np.fft.fftshift(campo_SalidaSinEscalar) * (deltas_Espacio["delta_Salida"] ** 2) * fase_Constante * fase_ParabolicaSalida #escalamos el campo de salida con las constantes
 
 intensidad_Salida = (np.abs(campo_Salida)) ** 2 #calculamos el patron de difraccion sacando modulo cuadrado
 
