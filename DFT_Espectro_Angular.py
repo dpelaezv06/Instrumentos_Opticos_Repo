@@ -1,5 +1,7 @@
-''' CODIGO PARA MOSTRAR LA DIFRACCIÓN POR ESPECTRO ANGULAR'''
-
+'''CODIGO PARA HACER EL ESPECTRO ANGULAR A TRAVÉS DE UNA DFT
+############  ¡¡¡ OJO !!! SIN ALGORITMOS FFT   ############# 
+### ¡¡¡SOLO FUNCIONA CON ARREGLOS UNIFORMES Y CUADRADOS ####
+# '''          
 '''  
 Estos son los paso que se van a desarrollar para 
 0 Definir los delta espaciales y frecuenciales que se utilizarán - Estos productos espacio frecuencia se pueden hallar con: from puntos_Mascaras import producto_EspacioFrecuencia [intervalo, resolucion]
@@ -10,24 +12,20 @@ Estos son los paso que se van a desarrollar para
 5 Se shiftea el resultado
 '''
 
-
 ''' LIBRERIAS USADAS EN EL CODIGO '''
 import numpy as np #numpy para usar funciones matematicas
 import scipy as sc #scipy para obtener constantes cientificas
 import matplotlib.pyplot as plt #matplotlib para graficar funciones
 import puntos_Mascaras as pts
+import Funciones_DFT as dft
 import time
 
-''' FUNCIONES UTILES PARA SACAR FRECUENCIAS DEPENDIENDO DE LOS PARAMETROS DE MUESTREO ...
-
-########################## CUIDADO!!!!! SOLO FUNCIONA CON VENTANAS CUADRADAS Y MUESTREOS UNIFORMES #######################'''
-
-#PARÁMETROS PARA LA DIFRACCIÓN POR ESPECTRO ANGULAR TODILLO EN mm
+''' Parámetros que se utilizarán para sacar la Difracción por espectro angular todas las medidas en mm '''
 
 longitud_onda = 632.8e-6                                #longitud de onda de un Láser de He-Ne
-numero_onda = 2*np.pi/longitud_onda
+numero_onda = 2*np.pi/longitud_onda                     #Pues sí, el número de onda
 ventana = 7                                             #Ventana en mm
-resolucion = 2048                                       #Número de puntos
+resolucion = 512                                        #Número de puntos 
 radio = 1                                               #Radio de 1.5mm para el círculo 
 Distancia_z = 15                                        #Distancia al plano de observación en mm
 
@@ -39,10 +37,10 @@ deltas = pts.producto_EspacioFrecuencia(ventana, resolucion)                    
 X_in, Y_in = pts.malla_Puntos(resolucion, ventana)                                          #Se prepara una malla de puntos para la máscara
 X_espectre, Y_espectre = pts.malla_Puntos(resolucion, resolucion*deltas["Delta_F"])         #Se crea una malla de puntos para el espectro
 mascara = pts.funcion_Circulo(radio, None, X_in,Y_in)                                       #Se crea la mascara de un círculo, este va a ser el Campo U[x,y,0] de entrada
-espectro_0 = (deltas["Delta_X"]**2) * np.fft.fftshift(np.fft.fft2(mascara))                 #Se calcula   la A[x,y,0]
+espectro_0 =   (deltas["Delta_X"]**2) * np.fft.fftshift(dft.dft2(mascara))
 termino_propagante = np.exp(1j*Distancia_z*numero_onda*np.sqrt(1-((longitud_onda**2) * ((X_espectre**2) + (Y_espectre**2)))))
 espectro_propagante = espectro_0 * termino_propagante        #Calculamos el espectro A[x,y,z]
-Campo_Propagante = (deltas["Delta_F"]**2) * np.fft.fftshift(np.fft.ifft2(espectro_propagante)) #Calculamos el campo U[x,y,z] y lo shifteamos
+Campo_Propagante = (deltas["Delta_F"]**2) * np.fft.fftshift(dft.idft2(espectro_propagante)) #Calculamos el campo U[x,y,z] y lo shifteamos
 intensidad_Salida = np.fft.fftshift(np.abs(Campo_Propagante)**2)
 
 #Funciones para calcular el tiempo que tarda el codigo
@@ -50,7 +48,7 @@ Reloj_2 = time.time()
 Final = Reloj_2 -Reloj_1
 print("El código tardó ejecutándose: ", Final)
 
-''' GRAFICAS '''
+'''GRÁFICAS'''
 fig, axes = plt.subplots(1, 2, figsize=(12, 6))  # Crear dos subgráficos (uno para el plano de abertura y otro para el plano de salida)
 
 # Gráfico del plano de la abertura
@@ -66,15 +64,6 @@ axes[1].set_title("Plano de Difracción")
 axes[1].set_xlabel("x' (mm)")
 axes[1].set_ylabel("y' (mm)")
 fig.colorbar(im_salida, ax=axes[1], label="Intensidad")  # Barra de color para el plano de difracción
-'''
-# Gráfico de la función de transferencia
-im_salida = axes[1].imshow(np.angle(espectro_propagante), extent=[X_in[0, 0], X_in[0, -1], Y_in[0, 0], Y_in[-1, 0]], cmap='gray' )
-axes[1].set_title("Plano de Difracción")
-axes[1].set_xlabel("x' (mm)")
-axes[1].set_ylabel("y' (mm)")
-fig.colorbar(im_salida, ax=axes[1], label="Intensidad")  # Barra de color para el plano de difracción
-'''
 
-# Mostrar ambas gráficas
 plt.tight_layout()
 plt.show()
