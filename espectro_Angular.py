@@ -1,7 +1,7 @@
 ''' CODIGO PARA MOSTRAR LA DIFRACCIÓN POR ESPECTRO ANGULAR'''
 
 '''  
-Estos son los paso que se van a desarrollar para 
+Estos son los paso que se van a desarrollar para  conseguir la difracción por espectro angular
 0 Definir los delta espaciales y frecuenciales que se utilizarán - Estos productos espacio frecuencia se pueden hallar con: from puntos_Mascaras import producto_EspacioFrecuencia [intervalo, resolucion]
 1 Generar U[n,m,0]  - Este campo se va a generar a través de las funciones contenidas en puntos_Mascaras
 2 Calcular A[p,q,0] - Este cálculo será realizado a través de la función espectro_Fuente, la cuál retorna el espectro de U(n,m,0)
@@ -15,10 +15,8 @@ Estos son los paso que se van a desarrollar para
 import numpy as np #numpy para usar funciones matematicas
 import scipy as sc #scipy para obtener constantes cientificas
 import matplotlib.pyplot as plt #matplotlib para graficar funciones
-import puntos_Mascaras as pts
+import diffraction_library as diff
 import time
-
-''' FUNCIONES UTILES PARA SACAR FRECUENCIAS DEPENDIENDO DE LOS PARAMETROS DE MUESTREO ...
 
 ########################## CUIDADO!!!!! SOLO FUNCIONA CON VENTANAS CUADRADAS Y MUESTREOS UNIFORMES #######################'''
 
@@ -29,21 +27,21 @@ numero_onda = 2*np.pi/longitud_onda
 ventana = 7                                             #Ventana en mm
 resolucion = 2048                                       #Número de puntos
 radio = 1                                               #Radio de 1.5mm para el círculo 
-Distancia_z = 15                                        #Distancia al plano de observación en mm
+Distancia_z = 10                                        #Distancia al plano de observación en mm
 
 #Función para calcular el tiempo que tarda el código
 Reloj_1 = time.time()
 
 '''Funciones para calcular la difracción '''
-deltas = pts.producto_EspacioFrecuencia(ventana, resolucion)                                #Regresa los delta espacio, frecuencia en un diccionario
-X_in, Y_in = pts.malla_Puntos(resolucion, ventana)                                          #Se prepara una malla de puntos para la máscara
-X_espectre, Y_espectre = pts.malla_Puntos(resolucion, resolucion*deltas["Delta_F"])         #Se crea una malla de puntos para el espectro
-mascara = pts.funcion_Circulo(radio, None, X_in,Y_in)                                       #Se crea la mascara de un círculo, este va a ser el Campo U[x,y,0] de entrada
-espectro_0 = (deltas["Delta_X"]**2) * np.fft.fftshift(np.fft.fft2(mascara))                 #Se calcula   la A[x,y,0]
+deltas = diff.producto_EspacioFrecuencia(ventana, resolucion)                                #Regresa los delta espacio, frecuencia en un diccionario
+X_in, Y_in = diff.malla_Puntos(resolucion, ventana)                                          #Se prepara una malla de puntos para la máscara
+X_espectre, Y_espectre = diff.malla_Puntos(resolucion, resolucion*deltas["Delta_F"])         #Se crea una malla de puntos para el espectro
+mascara = diff.funcion_Circulo(radio, None, X_in,Y_in)                                       #Se crea la mascara de un círculo, este va a ser el Campo U[x,y,0] de entrada
+espectro_0 = (deltas["Delta_X"]**2) * diff.dftshif2(np.fft.fft2(mascara))                 #Se calcula   la A[x,y,0]
 termino_propagante = np.exp(1j*Distancia_z*numero_onda*np.sqrt(1-((longitud_onda**2) * ((X_espectre**2) + (Y_espectre**2)))))
-espectro_propagante = espectro_0 * termino_propagante        #Calculamos el espectro A[x,y,z]
-Campo_Propagante = (deltas["Delta_F"]**2) * np.fft.fftshift(np.fft.ifft2(espectro_propagante)) #Calculamos el campo U[x,y,z] y lo shifteamos
-intensidad_Salida = np.fft.fftshift(np.abs(Campo_Propagante)**2)
+espectro_propagante = espectro_0 * termino_propagante                                       #Calculamos el espectro A[x,y,z]
+Campo_Propagante = (deltas["Delta_F"]**2) * diff.dftshif2(np.fft.ifft2(espectro_propagante)) #Calculamos el campo U[x,y,z] y lo shifteamos
+intensidad_Salida = diff.dftshif2(np.abs(Campo_Propagante)**2)
 
 #Funciones para calcular el tiempo que tarda el codigo
 Reloj_2 = time.time()

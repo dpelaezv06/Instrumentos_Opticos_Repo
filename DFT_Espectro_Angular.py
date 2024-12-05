@@ -16,8 +16,7 @@ Estos son los paso que se van a desarrollar para
 import numpy as np #numpy para usar funciones matematicas
 import scipy as sc #scipy para obtener constantes cientificas
 import matplotlib.pyplot as plt #matplotlib para graficar funciones
-import puntos_Mascaras as pts
-import Funciones_DFT as dft
+import diffraction_library as diff
 import time
 
 ''' Parámetros que se utilizarán para sacar la Difracción por espectro angular todas las medidas en mm '''
@@ -33,14 +32,14 @@ Distancia_z = 15                                        #Distancia al plano de o
 Reloj_1 = time.time()
 
 '''Funciones para calcular la difracción '''
-deltas = pts.producto_EspacioFrecuencia(ventana, resolucion)                                #Regresa los delta espacio, frecuencia en un diccionario
-X_in, Y_in = pts.malla_Puntos(resolucion, ventana)                                          #Se prepara una malla de puntos para la máscara
-X_espectre, Y_espectre = pts.malla_Puntos(resolucion, resolucion*deltas["Delta_F"])         #Se crea una malla de puntos para el espectro
-mascara = pts.funcion_Circulo(radio, None, X_in,Y_in)                                       #Se crea la mascara de un círculo, este va a ser el Campo U[x,y,0] de entrada
-espectro_0 =   (deltas["Delta_X"]**2) * np.fft.fftshift(dft.dft2(mascara))
+deltas = diff.producto_EspacioFrecuencia(ventana, resolucion)                                #Regresa los delta espacio, frecuencia en un diccionario
+X_in, Y_in = diff.malla_Puntos(resolucion, ventana)                                          #Se prepara una malla de puntos para la máscara
+X_espectre, Y_espectre = diff.malla_Puntos(resolucion, resolucion*deltas["Delta_F"])         #Se crea una malla de puntos para el espectro
+mascara = diff.funcion_Circulo(radio, None, X_in,Y_in)                                       #Se crea la mascara de un círculo, este va a ser el Campo U[x,y,0] de entrada
+espectro_0 =   (deltas["Delta_X"]**2) * np.fft.fftshift(diff.dft2(mascara))
 termino_propagante = np.exp(1j*Distancia_z*numero_onda*np.sqrt(1-((longitud_onda**2) * ((X_espectre**2) + (Y_espectre**2)))))
 espectro_propagante = espectro_0 * termino_propagante        #Calculamos el espectro A[x,y,z]
-Campo_Propagante = (deltas["Delta_F"]**2) * np.fft.fftshift(dft.idft2(espectro_propagante)) #Calculamos el campo U[x,y,z] y lo shifteamos
+Campo_Propagante = (deltas["Delta_F"]**2) * np.fft.fftshift(diff.idft2(espectro_propagante)) #Calculamos el campo U[x,y,z] y lo shifteamos
 intensidad_Salida = np.fft.fftshift(np.abs(Campo_Propagante)**2)
 
 #Funciones para calcular el tiempo que tarda el codigo

@@ -18,13 +18,14 @@ def producto_EspacioFrecuenciaFresnel (longitud_Onda, distancia_Propagacion, int
 ''' ENTRADAS '''
 #Relativas a la fuente de iluminacion
 longitud_Onda = 533E-9          #longitud de onda a utilizar
-distancia_Propagacion = 0.2     #distancia entre plano de mascara y plano de observacion
+distancia_Propagacion = 1      #distancia entre plano de mascara y plano de observacion
 
 #Relativas a la malla de puntos y la disposicion de la mascara
 ventana = 0.15
 resolucion = 6000
 xx_Entrada, yy_Entrada = pts.malla_Puntos(resolucion, ventana)
-mascara = pts.funcion_Rectangulo(3E-3,3E-3,None,xx_Entrada,yy_Entrada)
+#mascara = pts.funcion_Rectangulo(3E-3,3E-3,None,xx_Entrada,yy_Entrada)
+mascara = pts.funcion_Circulo(1E-3, None, xx_Entrada, yy_Entrada)  
 
 ''' Calculo de los terminos que intervienen en el modelo de difraccion por transformada de fresnel '''
 numero_Onda = 2*np.pi / longitud_Onda       #numero de onda

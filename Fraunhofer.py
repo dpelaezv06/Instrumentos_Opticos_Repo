@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-import puntos_Mascaras as pts
+import diffraction_library as diff
 
 resolucion = 5000  # Número de puntos en la malla
 longitud_Arreglo = 0.45  # Tamaño físico del área (10 mm)
@@ -10,10 +10,10 @@ long_Onda = 533E-9 #longitud de onda de la iluminacion
 distancia = 5000 #distancia de propagacion
 
 # Crear la malla de puntos
-xx, yy = pts.malla_Puntos(resolucion, longitud_Arreglo)
+xx, yy = diff.malla_Puntos(resolucion, longitud_Arreglo)
 
 # Crear la máscara circular
-mascara = pts.funcion_Rectangulo(4E-3, 4E-3, centro, xx, yy)
+mascara = diff.funcion_Rectangulo(4E-3, 4E-3, centro, xx, yy)
 
 #calculamos la fft de la iluminacion inicial
 fft_Mascara = np.fft.fftshift(np.fft.fft2(mascara))
