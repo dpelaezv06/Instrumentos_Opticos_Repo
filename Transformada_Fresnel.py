@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-import puntos_Mascaras as pts
+import diffraction_library as diff
 
 ''' FUNCIONES PROPIAS DEL PROGRAMA'''
 def producto_EspacioFrecuenciaFresnel (longitud_Onda, distancia_Propagacion, intervalo, resolucion): #Calculo del producto espacio frecuencia en transformada de fresnel
@@ -18,14 +18,14 @@ def producto_EspacioFrecuenciaFresnel (longitud_Onda, distancia_Propagacion, int
 ''' ENTRADAS '''
 #Relativas a la fuente de iluminacion
 longitud_Onda = 533E-9          #longitud de onda a utilizar
-distancia_Propagacion = 1      #distancia entre plano de mascara y plano de observacion
+distancia_Propagacion = 0.5      #distancia entre plano de mascara y plano de observacion
 
 #Relativas a la malla de puntos y la disposicion de la mascara
-ventana = 0.15
-resolucion = 6000
-xx_Entrada, yy_Entrada = pts.malla_Puntos(resolucion, ventana)
+ventana = 0.05
+resolucion = 2040
+xx_Entrada, yy_Entrada = diff.malla_Puntos(resolucion, ventana)
 #mascara = pts.funcion_Rectangulo(3E-3,3E-3,None,xx_Entrada,yy_Entrada)
-mascara = pts.funcion_Circulo(1E-3, None, xx_Entrada, yy_Entrada)  
+mascara = diff.funcion_Circulo(1E-3, None, xx_Entrada, yy_Entrada)  
 
 ''' Calculo de los terminos que intervienen en el modelo de difraccion por transformada de fresnel '''
 numero_Onda = 2*np.pi / longitud_Onda       #numero de onda
@@ -35,7 +35,7 @@ fase_Constante = ((np.exp(1j * numero_Onda * distancia_Propagacion)) / (1j * lon
 ''' calculo de las coordenadas del plano de salida usando el producto espacio frecuencia modificado para la transformada de fresnel '''
 deltas_Espacio = producto_EspacioFrecuenciaFresnel(longitud_Onda, distancia_Propagacion, ventana, resolucion) #calculamos los deltas del producto espacio frecuencia del 
 longitud_VentanaSalida = resolucion * deltas_Espacio["delta_Llegada"]
-xx_Salida, yy_Salida = pts.malla_Puntos(resolucion, longitud_VentanaSalida)
+xx_Salida, yy_Salida = diff.malla_Puntos(resolucion, longitud_VentanaSalida)
 
 ''' termino de la fase parabolica en el plano de salida '''
 fase_ParabolicaSalida = np.exp((1j * (numero_Onda / 2 * distancia_Propagacion) * ((xx_Salida ** 2) + (yy_Salida ** 2)))) #calculo de la fase parabolica en el plano de salida usando las coordenadas calculados en el plano de salida
