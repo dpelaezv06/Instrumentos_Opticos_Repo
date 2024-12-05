@@ -24,7 +24,7 @@ import time
 
 longitud_onda = 632.8E-6                                #longitud de onda de un Láser de He-Ne
 numero_onda = 2*np.pi/longitud_onda
-ventana = 7                                             #Ventana en mm
+ventana = 5                                             #Ventana en mm
 resolucion = 2048                                       #Número de puntos
 radio = 1                                               #Radio de 1.5mm para el círculo 
 Distancia_z = 10                                        #Distancia al plano de observación en mm
@@ -37,11 +37,11 @@ deltas = diff.producto_EspacioFrecuencia(ventana, resolucion)                   
 X_in, Y_in = diff.malla_Puntos(resolucion, ventana)                                          #Se prepara una malla de puntos para la máscara
 X_espectre, Y_espectre = diff.malla_Puntos(resolucion, resolucion*deltas["Delta_F"])         #Se crea una malla de puntos para el espectro
 mascara = diff.funcion_Circulo(radio, None, X_in,Y_in)                                       #Se crea la mascara de un círculo, este va a ser el Campo U[x,y,0] de entrada
-espectro_0 = (deltas["Delta_X"]**2) * diff.dftshif2(np.fft.fft2(mascara))                 #Se calcula   la A[x,y,0]
+espectro_0 = (deltas["Delta_X"]**2) * np.fft.fftshift(np.fft.fft2(mascara))                 #Se calcula   la A[x,y,0]
 termino_propagante = np.exp(1j*Distancia_z*numero_onda*np.sqrt(1-((longitud_onda**2) * ((X_espectre**2) + (Y_espectre**2)))))
 espectro_propagante = espectro_0 * termino_propagante                                       #Calculamos el espectro A[x,y,z]
-Campo_Propagante = (deltas["Delta_F"]**2) * diff.dftshif2(np.fft.ifft2(espectro_propagante)) #Calculamos el campo U[x,y,z] y lo shifteamos
-intensidad_Salida = diff.dftshif2(np.abs(Campo_Propagante)**2)
+Campo_Propagante = (deltas["Delta_F"]**2) * np.fft.fftshift(np.fft.ifft2(espectro_propagante)) #Calculamos el campo U[x,y,z] y lo shifteamos
+intensidad_Salida = np.fft.fftshift(np.abs(Campo_Propagante)**2)
 
 #Funciones para calcular el tiempo que tarda el codigo
 Reloj_2 = time.time()

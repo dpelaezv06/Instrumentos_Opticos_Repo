@@ -36,11 +36,11 @@ deltas = diff.producto_EspacioFrecuencia(ventana, resolucion)                   
 X_in, Y_in = diff.malla_Puntos(resolucion, ventana)                                          #Se prepara una malla de puntos para la máscara
 X_espectre, Y_espectre = diff.malla_Puntos(resolucion, resolucion*deltas["Delta_F"])         #Se crea una malla de puntos para el espectro
 mascara = diff.funcion_Circulo(radio, None, X_in,Y_in)                                       #Se crea la mascara de un círculo, este va a ser el Campo U[x,y,0] de entrada
-espectro_0 =   (deltas["Delta_X"]**2) * np.fft.fftshift(diff.dft2(mascara))
+espectro_0 =   (deltas["Delta_X"]**2) * diff.dftshift2(diff.dft2(mascara))
 termino_propagante = np.exp(1j*Distancia_z*numero_onda*np.sqrt(1-((longitud_onda**2) * ((X_espectre**2) + (Y_espectre**2)))))
 espectro_propagante = espectro_0 * termino_propagante        #Calculamos el espectro A[x,y,z]
-Campo_Propagante = (deltas["Delta_F"]**2) * np.fft.fftshift(diff.idft2(espectro_propagante)) #Calculamos el campo U[x,y,z] y lo shifteamos
-intensidad_Salida = np.fft.fftshift(np.abs(Campo_Propagante)**2)
+Campo_Propagante = (deltas["Delta_F"]**2) * diff.dftshift2(diff.idft2(espectro_propagante)) #Calculamos el campo U[x,y,z] y lo shifteamos
+intensidad_Salida = diff.dftshift2(np.abs(Campo_Propagante)**2)
 
 #Funciones para calcular el tiempo que tarda el codigo
 Reloj_2 = time.time()
