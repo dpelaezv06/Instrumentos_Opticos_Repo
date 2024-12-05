@@ -2,11 +2,11 @@ import numpy as np
 import matplotlib.pyplot as plt
 import diffraction_library as diff
 
-resolucion = 5000  # Número de puntos en la malla
+resolucion = 2040  # Número de puntos en la malla
 longitud_Arreglo = 0.1  # Tamaño físico del área (10 mm)
 radio = 2E-3  # Radio del círculo en metros
 centro = [0,0] # El centro será el origen 
-long_Onda = 533E-9 #longitud de onda de la iluminacion
+long_Onda = 632.8E-9 #longitud de onda de la iluminacion
 distancia = 5000 #distancia de propagacion
 
 # Crear la malla de puntos
@@ -23,6 +23,8 @@ numero_Onda = 2*np.pi/long_Onda #calculamos el numero de onda para propagar
 fase_Constante = (np.exp(1j* numero_Onda*distancia)) / (1j * long_Onda * distancia) #calculamos el elemento de fase constante para propagar las ondas en fraunhoffer
 patron_Difraccion = fft_Mascara * fase_Constante #calculamos el campo optico en el detector
 amplitud_Detector = (np.abs(patron_Difraccion)) ** 2 #calculamos la irradiancia sacando el modulo cuadrado 
+
+
 
 '''Visualización de gráficas cortes transversales'''
 
