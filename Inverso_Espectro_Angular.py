@@ -23,23 +23,23 @@ import diffraction_library as diff
 longitud_onda = 632.8E-6                                #longitud de onda de un Láser de He-Ne
 numero_onda = 2*np.pi/longitud_onda
 Tamaño_pixel = 3.45E-3                                  #3.45 um. Dato del enunciado           
-ventana = 2048 /Tamaño_pixel                            #Ventana en mm
+ventana = 2048 * Tamaño_pixel                            #Ventana en mm
 resolucion = 2048                                       #Número de puntos
-Distancia_z = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]                                        #Distancia al plano de observación en mm
-ruta_imagen_Intensidad = "C:\Users\josea\Documents\Trabajos_Ing_Fisica_UNAL\2024-2\Instrumentos_Opticos\Entrega_1\Intensity.png"
+Distancia_z = 150                                       #Distancia al plano de observación en mm
 
-'''Funciones para calcular la difracción '''
+'''Funciones para calcular la anti difracción adquiriendo la intensidad'''
 
 def Intensidad_Antipropagante():
     deltas = diff.producto_EspacioFrecuencia(ventana, resolucion)                                #Regresa los delta espacio, frecuencia en un diccionario
     X_in, Y_in = diff.malla_Puntos(resolucion, ventana)                                          #Se prepara una malla de puntos para la máscara
     X_espectre, Y_espectre = diff.malla_Puntos(resolucion, resolucion*deltas["Delta_F"])         #Se crea una malla de puntos para el espectro
     Intensidad_Medida = diff.abrir_imagen(ruta="Intensity.png")                                  #Asignamos un array de valores de intensidad al array en función de la imagen Intensity.png, este el campo U[n,m,z]
-    Espectro_propagante = np.fft.fftshift(np.fft.fft2(Intensidad_Medida)) / (deltas["Delta_F"]**2)                       #Campo A[p,q,z], este es el campo que se propaga, tener en cuenta que ya está multiplicado por una exponencial compleja de la cual desconocemos su valor de z
+    Campo_Amplitud = np.sqrt(Intensidad_Medida)
+    Espectro_propagante = np.fft.fftshift(np.fft.fft2(Campo_Amplitud)) / (deltas["Delta_F"]**2)                       #Campo A[p,q,z], este es el campo que se propaga, tener en cuenta que ya está multiplicado por una exponencial compleja de la cual desconocemos su valor de z
     Termino_antipropagante = np.exp(-1j*Distancia_z*numero_onda*np.sqrt(1-((longitud_onda**2) * ((X_espectre**2) + (Y_espectre**2))))) #La exponencial que antipropaga el espectro, por eso está con un negativo
     Espectro_0 = Espectro_propagante * Termino_antipropagante                                    #Espectro del campo en la entrada, llamese A[p,q,0]
     Mascara_Difractora = np.fft.fftshift(np.fft.ifft2(Espectro_0))  / (deltas["Delta_X"]**2)                             #Mascara que produjo la difracción, U[n,m,0]
-    Geometria_Mascara = np.abs(Mascara_Difractora)**2
+    Geometria_Mascara = np.fft.fftshift((np.abs(Mascara_Difractora)**2))
 
 
     ''' GRAFICAS '''
@@ -59,4 +59,40 @@ def Intensidad_Antipropagante():
     axes[1].set_ylabel("y' (mm)")
     fig.colorbar(im_salida, ax=axes[1], label="Intensidad")  # Barra de color para el plano de difracción
     plt.tight_layout()
-    return plt.show()
+    plt.show()
+    
+
+'''Función para calcular la anti difracción adquiriendo el campo complejo'''
+def Compleja_Antipropagante():
+    deltas = diff.producto_EspacioFrecuencia(ventana, resolucion)                                #Regresa los delta espacio, frecuencia en un diccionario
+    X_in, Y_in = diff.malla_Puntos(resolucion, ventana)                                          #Se prepara una malla de puntos para la máscara
+    X_espectre, Y_espectre = diff.malla_Puntos(resolucion, resolucion*deltas["Delta_F"])         #Se crea una malla de puntos para el espectro
+    Parte_Real = diff.abrir_imagen(ruta="Real.png")                                              #Asignamos un array de valores de intensidad al array en función de la imagen real.png, este es la parte real del campo Complej U[n,m,z]
+    Parte_Imaginaria = diff.abrir_imagen(ruta = "Imag.png")                                      #Parte imaginaria del Campo Complejo U[n,m,z]
+    Campo_Complejo = Parte_Real + 1j*Parte_Imaginaria                                            #Campo Complejo completo U[n,m,z]
+    Espectro_propagante = np.fft.fftshift(np.fft.fft2(Campo_Complejo)) / (deltas["Delta_F"]**2)                       #Campo A[p,q,z], este es el campo que se propaga, tener en cuenta que ya está multiplicado por una exponencial compleja de la cual desconocemos su valor de z
+    Termino_antipropagante = np.exp(-1j*Distancia_z*numero_onda*np.sqrt(1-((longitud_onda**2) * ((X_espectre**2) + (Y_espectre**2))))) #La exponencial que antipropaga el espectro, por eso está con un negativo
+    Espectro_0 = Espectro_propagante * Termino_antipropagante                                    #Espectro del campo en la entrada, llamese A[p,q,0]
+    Mascara_Difractora = np.fft.fftshift(np.fft.ifft2(Espectro_0))  / (deltas["Delta_X"]**2)                             #Mascara que produjo la difracción, U[n,m,0]
+    Geometria_Mascara = np.fft.fftshift((np.abs(Mascara_Difractora)**2))
+
+
+    ''' GRAFICAS '''
+    fig, axes = plt.subplots(1, 2, figsize=(12, 6))  # Crear dos subgráficos (uno para el plano de abertura y otro para el plano de salida)
+
+    # Gráfico de la máscara que produjo la difracción
+    im_entrada = axes[0].imshow(np.abs(Campo_Complejo), extent=[X_in[0, 0], X_in[0, -1], Y_in[0, 0], Y_in[-1, 0]], cmap='gray')
+    axes[0].set_title("Plano de difracción")
+    axes[0].set_xlabel("x (mm)")
+    axes[0].set_ylabel("y (mm)")
+    fig.colorbar(im_entrada, ax=axes[0], label="Intensidad")  # Barra de color para el plano de la abertura
+
+    # Gráfico del plano de difracción
+    im_salida = axes[1].imshow(Geometria_Mascara, extent=[X_in[0, 0], X_in[0, -1], Y_in[0, 0], Y_in[-1, 0]], cmap='gray', vmin=0, vmax=np.max(Geometria_Mascara))
+    axes[1].set_title("Máscara de difracción")
+    axes[1].set_xlabel("x' (mm)")
+    axes[1].set_ylabel("y' (mm)")
+    fig.colorbar(im_salida, ax=axes[1], label="Intensidad")  # Barra de color para el plano de difracción
+    plt.tight_layout()
+    plt.show()
+Compleja_Antipropagante()
