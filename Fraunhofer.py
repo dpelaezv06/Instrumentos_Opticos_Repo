@@ -26,7 +26,6 @@ amplitud_Detector = (np.abs(patron_Difraccion)) ** 2 #calculamos la irradiancia 
 
 
 '''visualizacion de graficas cortes transversales '''
-
 # Visualización de la mascara
 plt.figure(figsize=(6, 6))
 plt.imshow(np.abs(mascara), extent=[-longitud_Arreglo/2, longitud_Arreglo/2, -longitud_Arreglo/2, longitud_Arreglo/2], cmap='gray')
@@ -34,14 +33,6 @@ plt.title("Máscara Circular")
 plt.xlabel("x (m)")
 plt.ylabel("y (m)")
 plt.colorbar(label="Transmitancia")
-plt.show()
-
-# Visualización del espectro de la mascara
-plt.imshow(np.abs(fft_Mascara), extent=[-longitud_Arreglo/2, longitud_Arreglo/2, -longitud_Arreglo/2, longitud_Arreglo/2], cmap='inferno', vmax= 0.65*(np.max(np.abs(fft_Mascara))))
-plt.title("Espectro de la mascara")
-plt.xlabel("u (1/m)")
-plt.ylabel("v (1/m)")
-plt.colorbar(label="Amplitud del espectro")
 plt.show()
 
 # Visualizacion del patron de difraccion
