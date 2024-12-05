@@ -22,7 +22,7 @@ import time
 
 #PARÁMETROS PARA LA DIFRACCIÓN POR ESPECTRO ANGULAR TODILLO EN mm
 
-longitud_onda = 632.8e-6                                #longitud de onda de un Láser de He-Ne
+longitud_onda = 632.8E-6                                #longitud de onda de un Láser de He-Ne
 numero_onda = 2*np.pi/longitud_onda
 ventana = 7                                             #Ventana en mm
 resolucion = 2048                                       #Número de puntos
