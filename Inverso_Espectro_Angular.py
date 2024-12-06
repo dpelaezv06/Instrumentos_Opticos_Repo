@@ -53,7 +53,7 @@ def Intensidad_Antipropagante():
     fig.colorbar(im_entrada, ax=axes[0], label="Intensidad")  # Barra de color para el plano de la abertura
 
     # Gráfico del plano de difracción
-    im_salida = axes[1].imshow(Geometria_Mascara, extent=[X_in[0, 0], X_in[0, -1], Y_in[0, 0], Y_in[-1, 0]], cmap='gray', vmin=0, vmax=np.max(Geometria_Mascara))
+    im_salida = axes[1].imshow(Geometria_Mascara, extent=[X_in[0, 0], X_in[0, -1], Y_in[0, 0], Y_in[-1, 0]], cmap='gray', vmin=4E12, vmax=1.4E13)
     axes[1].set_title("Máscara de difracción")
     axes[1].set_xlabel("x' (mm)")
     axes[1].set_ylabel("y' (mm)")
@@ -70,10 +70,10 @@ def Compleja_Antipropagante():
     Parte_Real = diff.abrir_imagen(ruta="Real.png")                                              #Asignamos un array de valores de intensidad al array en función de la imagen real.png, este es la parte real del campo Complej U[n,m,z]
     Parte_Imaginaria = diff.abrir_imagen(ruta = "Imag.png")                                      #Parte imaginaria del Campo Complejo U[n,m,z]
     Campo_Complejo = Parte_Real + 1j*Parte_Imaginaria                                            #Campo Complejo completo U[n,m,z]
-    Espectro_propagante = np.fft.fftshift(np.fft.fft2(Campo_Complejo)) / (deltas["Delta_F"]**2)                       #Campo A[p,q,z], este es el campo que se propaga, tener en cuenta que ya está multiplicado por una exponencial compleja de la cual desconocemos su valor de z
+    Espectro_propagante = np.fft.fftshift(np.fft.fft2(Campo_Complejo)) / (deltas["Delta_F"]**2)  #Campo A[p,q,z], este es el campo que se propaga, tener en cuenta que ya está multiplicado por una exponencial compleja de la cual desconocemos su valor de z
     Termino_antipropagante = np.exp(-1j*Distancia_z*numero_onda*np.sqrt(1-((longitud_onda**2) * ((X_espectre**2) + (Y_espectre**2))))) #La exponencial que antipropaga el espectro, por eso está con un negativo
     Espectro_0 = Espectro_propagante * Termino_antipropagante                                    #Espectro del campo en la entrada, llamese A[p,q,0]
-    Mascara_Difractora = np.fft.fftshift(np.fft.ifft2(Espectro_0))  / (deltas["Delta_X"]**2)                             #Mascara que produjo la difracción, U[n,m,0]
+    Mascara_Difractora = np.fft.fftshift(np.fft.ifft2(Espectro_0))  / (deltas["Delta_X"]**2)     #Mascara que produjo la difracción, U[n,m,0]
     Geometria_Mascara = np.fft.fftshift((np.abs(Mascara_Difractora)**2))
 
 
@@ -88,11 +88,12 @@ def Compleja_Antipropagante():
     fig.colorbar(im_entrada, ax=axes[0], label="Intensidad")  # Barra de color para el plano de la abertura
 
     # Gráfico del plano de difracción
-    im_salida = axes[1].imshow(Geometria_Mascara, extent=[X_in[0, 0], X_in[0, -1], Y_in[0, 0], Y_in[-1, 0]], cmap='gray', vmin=0, vmax=np.max(Geometria_Mascara))
+    im_salida = axes[1].imshow(Geometria_Mascara, extent=[X_in[0, 0], X_in[0, -1], Y_in[0, 0], Y_in[-1, 0]], cmap='gray', vmin=8.5E12, vmax=1.6E13)
     axes[1].set_title("Máscara de difracción")
     axes[1].set_xlabel("x' (mm)")
     axes[1].set_ylabel("y' (mm)")
     fig.colorbar(im_salida, ax=axes[1], label="Intensidad")  # Barra de color para el plano de difracción
     plt.tight_layout()
     plt.show()
+Intensidad_Antipropagante()
 Compleja_Antipropagante()
