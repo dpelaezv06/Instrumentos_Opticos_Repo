@@ -152,3 +152,4 @@ cython_debug/
 #.idea/
 *.code-workspace
 *.py
+chambonadas.py
