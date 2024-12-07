@@ -27,8 +27,9 @@ distancia_Propagacion = 0.5      #distancia entre plano de mascara y plano de ob
 ventana = 0.05
 resolucion = 2040
 xx_Entrada, yy_Entrada = diff.malla_Puntos(resolucion, ventana)
-#mascara = pts.funcion_Rectangulo(3E-3,3E-3,None,xx_Entrada,yy_Entrada)
-mascara = diff.funcion_Circulo(1E-3, None, xx_Entrada, yy_Entrada)  
+#mascara = diff.funcion_Rectangulo(3E-3,3E-3,None,xx_Entrada,yy_Entrada)
+#mascara = diff.funcion_Circulo(1E-3, None, xx_Entrada, yy_Entrada)  
+mascara = diff.funcion_punto_3(1, 5E-3, xx_Entrada)
 
 ''' Calculo de los terminos que intervienen en el modelo de difraccion por transformada de fresnel '''
 numero_Onda = 2*np.pi / longitud_Onda       #numero de onda
@@ -67,7 +68,7 @@ axes[0].set_ylabel("y (m)")
 fig.colorbar(im_entrada, ax=axes[0], label="Intensidad")  # Barra de color para el plano de la abertura
 
 # Gráfico del plano de difracción
-im_salida = axes[1].imshow(intensidad_Salida, extent=[xx_Salida[0, 0], xx_Salida[0, -1], yy_Salida[0, 0], yy_Salida[-1, 0]], cmap='gray', vmin=0, vmax=np.max(intensidad_Salida))
+im_salida = axes[1].imshow(intensidad_Salida, extent=[xx_Salida[0, 0], xx_Salida[0, -1], yy_Salida[0, 0], yy_Salida[-1, 0]], cmap='gray', vmin=0, vmax=0.4*np.max(intensidad_Salida))
 axes[1].set_title("Plano de Difracción")
 axes[1].set_xlabel("x' (m)")
 axes[1].set_ylabel("y' (m)")

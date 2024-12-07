@@ -95,5 +95,5 @@ def Compleja_Antipropagante():
     fig.colorbar(im_salida, ax=axes[1], label="Intensidad")  # Barra de color para el plano de difracción
     plt.tight_layout()
     plt.show()
-Intensidad_Antipropagante()
-    
+#Intensidad_Antipropagante()
+Compleja_Antipropagante()    

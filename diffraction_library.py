@@ -94,6 +94,12 @@ def malla_Puntos(resolucion, longitud_Arreglo): #funcion que crea mallas de punt
     xx, yy = np.meshgrid(x, y) #crea una malla de puntos bidimensional 
     return xx, yy #retornamos la malla de puntos
 
+def funcion_punto_3(m, L, xx): # Función que retorna un array con la transmitancia de la función 1/2 + m/2 cos(2*pi*x/L). La del punto 3
+    ''' ¡¡¡¡    OJO    !!!!!
+    xx debe estar creado a partir de la función malla_puntos para un correcto funcionamiento bidimensional
+    '''
+    transmitancia = 1 / 2 + m / 2 * np.cos(2 * np.pi * xx / L)
+    return transmitancia
 
 def funcion_Circulo(radio, centro, xx, yy): #definicion de la funcion para hacer un circulo transparente en una malla ded puntos
     ''' CREACCION DEL CONJUNTO DE PUNTOS DE LA MASCARA DE DFRACCION 
