@@ -47,7 +47,7 @@ fase_ParabolicaSalida = np.exp((1j * (numero_Onda / 2 * distancia_Propagacion) *
 ''' operaciones para obtener el campo de salida '''
 campo_EntradaParabolico = mascara * fase_ParabolicaEntrada #preparamos el campo de entrada para meterlo a la fft
 campo_SalidaSinEscalar = diff.dft2(campo_EntradaParabolico) #calculamos la fft del campo de entrada multiplicado por la fase parabolica
-campo_Salida = diff.dftshif2(campo_SalidaSinEscalar) * (deltas_Espacio["delta_Salida"] ** 2) * fase_Constante * fase_ParabolicaSalida #escalamos el campo de salida con las constantes
+campo_Salida = diff.dftshift2(campo_SalidaSinEscalar) * (deltas_Espacio["delta_Salida"] ** 2) * fase_Constante * fase_ParabolicaSalida #escalamos el campo de salida con las constantes
 
 intensidad_Salida = (np.abs(campo_Salida)) ** 2 #calculamos el patron de difraccion sacando modulo cuadrado
 

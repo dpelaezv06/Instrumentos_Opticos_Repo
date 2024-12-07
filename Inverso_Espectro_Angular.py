@@ -38,8 +38,8 @@ def Intensidad_Antipropagante():
     Espectro_propagante = np.fft.fftshift(np.fft.fft2(Campo_Amplitud)) / (deltas["Delta_F"]**2)                       #Campo A[p,q,z], este es el campo que se propaga, tener en cuenta que ya está multiplicado por una exponencial compleja de la cual desconocemos su valor de z
     Termino_antipropagante = np.exp(-1j*Distancia_z*numero_onda*np.sqrt(1-((longitud_onda**2) * ((X_espectre**2) + (Y_espectre**2))))) #La exponencial que antipropaga el espectro, por eso está con un negativo
     Espectro_0 = Espectro_propagante * Termino_antipropagante                                    #Espectro del campo en la entrada, llamese A[p,q,0]
-    Mascara_Difractora = np.fft.fftshift(np.fft.ifft2(Espectro_0))  / (deltas["Delta_X"]**2)                             #Mascara que produjo la difracción, U[n,m,0]
-    Geometria_Mascara = np.fft.fftshift((np.abs(Mascara_Difractora)**2))
+    Mascara_Difractora = (np.fft.ifft2(Espectro_0))  / (deltas["Delta_X"]**2)                             #Mascara que produjo la difracción, U[n,m,0]
+    Geometria_Mascara = np.abs(Mascara_Difractora)**2
 
 
     ''' GRAFICAS '''
@@ -73,8 +73,8 @@ def Compleja_Antipropagante():
     Espectro_propagante = np.fft.fftshift(np.fft.fft2(Campo_Complejo)) / (deltas["Delta_F"]**2)  #Campo A[p,q,z], este es el campo que se propaga, tener en cuenta que ya está multiplicado por una exponencial compleja de la cual desconocemos su valor de z
     Termino_antipropagante = np.exp(-1j*Distancia_z*numero_onda*np.sqrt(1-((longitud_onda**2) * ((X_espectre**2) + (Y_espectre**2))))) #La exponencial que antipropaga el espectro, por eso está con un negativo
     Espectro_0 = Espectro_propagante * Termino_antipropagante                                    #Espectro del campo en la entrada, llamese A[p,q,0]
-    Mascara_Difractora = np.fft.fftshift(np.fft.ifft2(Espectro_0))  / (deltas["Delta_X"]**2)     #Mascara que produjo la difracción, U[n,m,0]
-    Geometria_Mascara = np.fft.fftshift((np.abs(Mascara_Difractora)**2))
+    Mascara_Difractora = (np.fft.ifft2(Espectro_0))  / (deltas["Delta_X"]**2)     #Mascara que produjo la difracción, U[n,m,0]
+    Geometria_Mascara = np.abs(Mascara_Difractora)**2
 
 
     ''' GRAFICAS '''
@@ -96,4 +96,4 @@ def Compleja_Antipropagante():
     plt.tight_layout()
     plt.show()
 Intensidad_Antipropagante()
-Compleja_Antipropagante()
+    
