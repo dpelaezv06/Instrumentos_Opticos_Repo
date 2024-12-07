@@ -59,3 +59,5 @@ axes[1].set_ylabel("y' (mm)")
 fig.colorbar(im_salida, ax=axes[1], label="Intensidad")  # Barra de color para el plano de difracción
 plt.tight_layout()
 plt.show()
+
+#sjkjakls
