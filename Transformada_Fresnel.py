@@ -21,7 +21,7 @@ reloj_1 = time.time()
 ''' ENTRADAS '''
 #Relativas a la fuente de iluminacion
 longitud_Onda = 533E-9          #longitud de onda a utilizar
-distancia_Propagacion = (400*(1E-3))/longitud_Onda      #distancia entre plano de mascara y plano de observacion
+distancia_Propagacion = (400*(1E-3)**2)/longitud_Onda      #distancia entre plano de mascara y plano de observacion
 
 #Relativas a la malla de puntos y la disposicion de la mascara
 ventana = 0.05
