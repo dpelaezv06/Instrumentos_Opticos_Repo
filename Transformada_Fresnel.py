@@ -21,15 +21,15 @@ reloj_1 = time.time()
 ''' ENTRADAS '''
 #Relativas a la fuente de iluminacion
 longitud_Onda = 533E-9          #longitud de onda a utilizar
-distancia_Propagacion = 0.5      #distancia entre plano de mascara y plano de observacion
+distancia_Propagacion = 0.1      #distancia entre plano de mascara y plano de observacion
 
 #Relativas a la malla de puntos y la disposicion de la mascara
-ventana = 0.05
-resolucion = 2040
+ventana = 0.0001
+resolucion = 500
 xx_Entrada, yy_Entrada = diff.malla_Puntos(resolucion, ventana)
 #mascara = diff.funcion_Rectangulo(3E-3,3E-3,None,xx_Entrada,yy_Entrada)
 #mascara = diff.funcion_Circulo(1E-3, None, xx_Entrada, yy_Entrada)  
-mascara = diff.funcion_punto_3(1, 5E-3, xx_Entrada)
+mascara = diff.funcion_punto_3(1, 1E-3/500, xx_Entrada)
 
 ''' Calculo de los terminos que intervienen en el modelo de difraccion por transformada de fresnel '''
 numero_Onda = 2*np.pi / longitud_Onda       #numero de onda
