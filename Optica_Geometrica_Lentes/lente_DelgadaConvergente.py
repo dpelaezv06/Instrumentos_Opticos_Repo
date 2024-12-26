@@ -1,4 +1,4 @@
-from Modelos_Difraccion import diffraction_library as diff
+from ..Modelos_Difraccion import diffraction_library as diff
 import numpy as np
 import matplotlib.pyplot as plt
 
