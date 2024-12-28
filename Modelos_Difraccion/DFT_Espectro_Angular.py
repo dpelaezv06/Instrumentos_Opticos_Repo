@@ -15,7 +15,7 @@ Estos son los paso que se van a desarrollar para  conseguir la difracción por e
 import numpy as np #numpy para usar funciones matematicas
 import scipy as sc #scipy para obtener constantes cientificas
 import matplotlib.pyplot as plt #matplotlib para graficar funciones
-import diffraction_library as diff
+import libraries.optics_library as opt
 import time
 
 ########################## CUIDADO!!!!! SOLO FUNCIONA CON VENTANAS CUADRADAS Y MUESTREOS UNIFORMES #######################'''
@@ -29,24 +29,17 @@ resolucion = 512                                        #Número de puntos
 radio = 1                                               #Radio de 1.5mm para el círculo 
 Distancia_z = 20                                        #Distancia al plano de observación en mm
 
-#Función para calcular el tiempo que tarda el código
-Reloj_1 = time.time()
 
 '''Funciones para calcular la difracción '''
-deltas = diff.producto_EspacioFrecuencia(ventana, resolucion)                                #Regresa los delta espacio, frecuencia en un diccionario
-X_in, Y_in = diff.malla_Puntos(resolucion, ventana)                                          #Se prepara una malla de puntos para la máscara
-X_espectre, Y_espectre = diff.malla_Puntos(resolucion, resolucion*deltas["Delta_F"])         #Se crea una malla de puntos para el espectro
-mascara = diff.funcion_Circulo(radio, None, X_in,Y_in)                                       #Se crea la mascara de un círculo, este va a ser el Campo U[x,y,0] de entrada
-espectro_0 = (deltas["Delta_X"]**2) * diff.dftshift2(diff.dft2(mascara))                 #Se calcula   la A[x,y,0]
+deltas = opt.producto_EspacioFrecuencia(ventana, resolucion)                                #Regresa los delta espacio, frecuencia en un diccionario
+X_in, Y_in = opt.mascaras.malla_Puntos(resolucion, ventana)                                          #Se prepara una malla de puntos para la máscara
+X_espectre, Y_espectre = opt.mascaras.malla_Puntos(resolucion, resolucion*deltas["Delta_F"])         #Se crea una malla de puntos para el espectro
+mascara = opt.funcion_Circulo(radio, None, X_in,Y_in)                                       #Se crea la mascara de un círculo, este va a ser el Campo U[x,y,0] de entrada
+espectro_0 = (deltas["Delta_X"]**2) * opt.dftshift2(opt.dft2(mascara))                 #Se calcula   la A[x,y,0]
 termino_propagante = np.exp(1j*Distancia_z*numero_onda*np.sqrt(1-((longitud_onda**2) * ((X_espectre**2) + (Y_espectre**2)))))
 espectro_propagante = espectro_0 * termino_propagante                                       #Calculamos el espectro A[x,y,z]
-Campo_Propagante = (deltas["Delta_F"]**2) * diff.idft2(espectro_propagante) #Calculamos el campo U[x,y,z] y lo shifteamos
+Campo_Propagante = (deltas["Delta_F"]**2) * opt.idft2(espectro_propagante) #Calculamos el campo U[x,y,z] y lo shifteamos
 intensidad_Salida = np.abs(Campo_Propagante)**2
-
-#Funciones para calcular el tiempo que tarda el codigo
-Reloj_2 = time.time()
-Final = Reloj_2 -Reloj_1
-print("El código tardó ejecutándose: ", Final)
 
 ''' GRAFICAS '''
 fig, axes = plt.subplots(1, 2, figsize=(12, 6))  # Crear dos subgráficos (uno para el plano de abertura y otro para el plano de salida)

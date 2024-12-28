@@ -13,10 +13,8 @@ Estos son los paso que se van a desarrollar para  conseguir la difracción por e
 
 ''' LIBRERIAS USADAS EN EL CODIGO '''
 import numpy as np #numpy para usar funciones matematicas
-import scipy as sc #scipy para obtener constantes cientificas
 import matplotlib.pyplot as plt #matplotlib para graficar funciones
-import diffraction_library as diff
-import time
+import optics_library.mascaras as diff
 
 ########################## CUIDADO!!!!! SOLO FUNCIONA CON VENTANAS CUADRADAS Y MUESTREOS UNIFORMES #######################'''
 
@@ -29,9 +27,6 @@ resolucion = 2048                                       #Número de puntos
 radio = 1                                               #Radio de 1.5mm para el círculo 
 Distancia_z = 15                                        #Distancia al plano de observación en mm
 
-#Función para calcular el tiempo que tarda el código
-Reloj_1 = time.time()
-
 '''Funciones para calcular la difracción '''
 deltas = diff.producto_EspacioFrecuencia(ventana, resolucion)                                #Regresa los delta espacio, frecuencia en un diccionario
 X_in, Y_in = diff.malla_Puntos(resolucion, ventana)                                          #Se prepara una malla de puntos para la máscara
@@ -43,10 +38,6 @@ espectro_propagante = espectro_0 * termino_propagante                           
 Campo_Propagante = (deltas["Delta_F"]**2) * np.fft.ifft2(espectro_propagante) #Calculamos el campo U[x,y,z] y lo shifteamos
 intensidad_Salida = np.abs(Campo_Propagante)**2
 
-#Funciones para calcular el tiempo que tarda el codigo
-Reloj_2 = time.time()
-Final = Reloj_2 -Reloj_1
-print("El código tardó ejecutándose: ", Final)
 
 ''' GRAFICAS '''
 fig, axes = plt.subplots(1, 2, figsize=(12, 6))  # Crear dos subgráficos (uno para el plano de abertura y otro para el plano de salida)
