@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-import diffraction_library as diff
+import optics_library.mascaras as diff
 
 resolucion = 2040  # Número de puntos en la malla
 longitud_Arreglo = 0.1  # Tamaño físico del área (10 mm)
