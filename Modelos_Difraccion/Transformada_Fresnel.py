@@ -15,8 +15,6 @@ def producto_EspacioFrecuenciaFresnel (longitud_Onda, distancia_Propagacion, int
     deltas = {"delta_Salida": delta_Salida, "delta_Llegada": delta_Llegada} #ponemos ambos deltas en un diccionario
     return deltas #retornamos el diccionario con los deltas
 
-#Función para calcular el tiempo que tarda el código
-reloj_1 = time.time()
 
 ''' ENTRADAS '''
 #Relativas a la fuente de iluminacion
@@ -52,11 +50,6 @@ campo_Salida = np.fft.fftshift(campo_SalidaSinEscalar) * (deltas_Espacio["delta_
 
 intensidad_Salida = (np.abs(campo_Salida)) ** 2 #calculamos el patron de difraccion sacando modulo cuadrado
 
-
-#Funciones para calcular el tiempo de ejecucion
-reloj_2 = time.time()
-tiempo = reloj_2 - reloj_1
-print("Tiempo de ejecucion: ", tiempo)
 
 ''' GRAFICAS '''
 fig, axes = plt.subplots(1, 2, figsize=(12, 6))  # Crear dos subgráficos (uno para el plano de abertura y otro para el plano de salida)

@@ -1,0 +1,69 @@
+En este documento se recoge la totalidad de las funciones disponibles a lo largo del repositorio.
+
+MODULOS
+1. optics_libray
+2. Modelos_Difraccion
+
+FUNCIONES POR MODULO
+optics_libray.mascaras
+    malla_Puntos(resolucion, longitud_Arreglo)
+        Crea mallas de puntos
+        ENTRADAS:
+            resolucion == cantidad de puntos del arreglo
+            longitud_Arreglo == longitud física del arreglo
+        RETORNA:
+            xx, yy -> malla de puntos cuadrada
+
+    funcion_punto_3(m, L, xx)
+        Crea un meshgrid con la función requerida en el punto 3 de la entrega 1
+        1/2 + m/2 * cos(2*pi*xx/L)
+        ENTRADAS:
+            m, L == Parametros de la funcion
+            xx == grid en el cuál se quiere representar la funcion, favorablemente que provenga de malla_Puntos
+
+    funcion_Circulo(radio, centro, xx, yy)
+        Crea una máscara con un círculo 
+        ENTRADAS:
+            radio == radio de circunferencia
+            centro == array con las coordenadas espaciales del centro de la circunferencia
+            xx, yy == malla de puntos bidimensional en la cual se crea la circunferencia
+        RETORNA:
+            Mascara con un círculo (Array 2D)
+
+    funcion_Rectangulo(base, altura, centro, xx, yy)
+        Crea una máscara con un rectángulo
+        ENTRADAS:
+            base == float (Base obviamente)
+            altura == float (Altura obviamente)
+            centro == lista [X,Y]
+            xx, yy == malla de puntos en la cual se verá el rectángulo
+        RETORNO:
+            Mascara (Array 2D)
+    
+    producto_EspacioFrecuencia (intervalo, resolucion)
+        Funcion que retorna los delta espacio y delta frecuencia para un muestreo particular
+        ENTRADAS:
+            intervalo == longitud fisica del intervalo del arreglo
+            resolucion == numero de puntos que tiene la malla del arreglo
+        RETORNA:
+            Diccionario que contiene los deltas, para acceder:
+            deltas["Delta_X"] - para acceder al delta espacial
+            deltas["Delta_F"] - para acceder al delta frecuencial
+
+    img_to_array(ruta)
+        Convierte una imagen preferiblemente en escala de grises en un array
+        de intensidades normalizadas
+        Entradas:
+            ruta == ruta de la imagen
+        RETORNA:
+            array de intensidades
+
+Modelos_Difraccion.espectro_Angular
+    espectro_angular(mascara, ventana, Distancia_z, longitud_onda = 632.8E-9)
+            Esta función calcula la difracción a través del método de espectro angular.
+            ENTRADAS:
+                mascara == grid 2D el cuál simboliza la apertura por la cual la luz se propaga
+                ventana == tamaño de la ventana de observación
+                Distancia_z == Distancia que se propaga el espectro desde que choca con la mascara
+            RETORNA:
+                Ventana emergente con el gráfico que representa la difracción
