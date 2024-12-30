@@ -64,6 +64,3 @@ def lente_Convergente(campo_Entrada, longitud_Onda, delta_X, foco, opacidad):
           1, asumiendo una leente completamente transparente
           
         Retorna: Campo optico en la salida de la lente'''
-
-
-
