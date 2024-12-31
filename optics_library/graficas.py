@@ -41,4 +41,3 @@ def fase(campo, ventana):
     plt.title("Mapa de fase") #agregamos un titulo en el grafico
     plt.show() #mostramos el grafico
 
-
