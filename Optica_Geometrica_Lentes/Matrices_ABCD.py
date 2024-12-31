@@ -9,107 +9,107 @@ Para simbolizar los rayos
 import numpy as np
 
 '''Funcion para el caso de radios infinitos'''
-def infinity(Radio):
+def infinity(radio):
     try:
-        Radio = float(Radio)        #Intenta transformar el radio a un float
-        return Radio
+        radio = float(radio)        #Intenta transformar el radio a un float
+        return radio
     except:
         return np.inf       #Si el usuario pone algo como inf, entonces se hace infinito (Sirve para cualquier str)
 
 '''Matriz de Entrada del sistema'''
-def Matriz_inicial():
+def matriz_Inicial():
     return np.eye(2)        #Se crea una matriz identidad para inciar a trabajar
 
 '''Matriz de Refracción'''
-def Refraccion(Radio, n_incidente, n_transmitido):
+def refraccion(radio, n_Incidente, n_Transmitido):
     '''
     Función para calcular la matriz correspondiente a una interfase que se refracta
     ENTRADAS:
-        Radio         == float (si es finito), str (si se quiere un infinito)
-        n_incidente   == float
-        n_transmitido == float
+        radio         == float (si es finito), str (si se quiere un infinito)
+        n_Incidente   == float
+        n_Transmitido == float
         Todas estas son propiedades físicas de la interfase
     RETORNA:
         Matriz correspondiente a la transformación que genera la interfase
     '''
-    Matriz = Matriz_inicial()                           # Creamos una matriz arbitraria para empezar a meter datos, fíjese que es identidad para facilitar las cosas
-    Matriz[0,1] = -(n_transmitido - n_incidente)/ infinity(Radio)  # Creamos la matriz refracción como debe ser
+    matriz = matriz_Inicial()                           # Creamos una matriz arbitraria para empezar a meter datos, fíjese que es identidad para facilitar las cosas
+    matriz[0,1] = -(n_Transmitido - n_Incidente)/ infinity(radio)  # Creamos la matriz refracción como debe ser
     '''
     | 1 -P |    
     | 0  1 |
     '''
     #Donde P es el poder de la interfas, P = (n_transmitido - n_incidente)/Radio
-    return Matriz
+    return matriz
 
 '''Matriz de Reflexión'''
-def Reflexion(Radio, n_medio):
+def reflexion(radio, n_Medio):
     '''
     Función para calcular la matriz correspondiente a un interfase que refleja
     ENTRADAS:
-        Radio   == float (si es finito), str (si se quiere un infinito), tome en cuenta que debe estar con el signo adecuado dependiendo de la concavidad
-        n_medio == float 
+        radio   == float (si es finito), str (si se quiere un infinito), tome en cuenta que debe estar con el signo adecuado dependiendo de la concavidad
+        n_Medio == float 
         Todas estas son propiedades físicas de la interfase
     RETORNA:
         Matriz correspondiente a la transformación que genera la interfase
     '''
-    Matriz = Matriz_inicial()         #Se crea matriz identidad para empezar a trabajar
-    Matriz[0,1] = 2*n_medio / infinity(Radio) #Se asigna el valor correspondiente al índice de la matriz
+    matriz = matriz_Inicial()         #Se crea matriz identidad para empezar a trabajar
+    matriz[0,1] = 2*n_Medio / infinity(radio) #Se asigna el valor correspondiente al índice de la matriz
     '''
     | 1 2*n_i/R |    
     | 0     1   |
     '''  
-    return Matriz
+    return matriz
 
 '''Matriz de Traslacion entre vértices'''
-def Traslacion_entre_vertices(Distancia, n_medio):
+def Traslacion_EntreVertices(distancia, n_Medio):
     '''
     Función para calcular la matriz correspondiente a una traslación
     ENTRADAS:
         n_medio   == float 
-        Distancia == float
-    RETORNA
+        distancia == float
+    RETORNA:
         Matriz que da cuenta de la traslación entre vértices
     '''
-    Matriz = Matriz_inicial()           #Se crea matriz identidad para empezar a trabajar
-    Matriz[1,0] = Distancia/ n_medio    #Se asigna el valor adecuado en la posición correspondiente
+    matriz = matriz_Inicial()           #Se crea matriz identidad para empezar a trabajar
+    matriz[1,0] = distancia/ n_Medio    #Se asigna el valor adecuado en la posición correspondiente
     '''
     |1   0|
     |D/n 1|
     '''
-    return Matriz
+    return matriz
 
 '''Matriz de traslación objeto - vértice'''
-def Traslacion_objeto_vertice(Distancia, n_medio):
+def Traslacion_objetoVertice(distancia, n_Medio):
     '''
     Funcion para calcular la transferencia entre el objeto y el primer vértice
     ENTRADAS:
-        Distancia == float
+        distancia == float
         n_medio   == float
     RETORNA:
         Matriz que da cuenta de la transferencia
     '''
-    Matriz = Matriz_inicial()             #Se crea matriz identidad para empezar a trabajar
-    Matriz[1,0] = Distancia / n_medio     #Se asigna el valor adecuado en la posición correspondiente
-    return Matriz
+    matriz = matriz_Inicial()             #Se crea matriz identidad para empezar a trabajar
+    matriz[1,0] = distancia / n_Medio     #Se asigna el valor adecuado en la posición correspondiente
+    return matriz
 
 '''Matriz de una lente delgada'''
-def Lente_delgada(Radio_1, Radio_2 , n_incidente, n_lente, n_salida, tamaño_fisico = None):
+def lente_Delgada(radio_1, radio_2 , n_Incidente, n_Lente, n_Salida, tamaño_Fisico = None):
     '''
     Función para calcular la matriz ABCD de un lente delgado
     ENTRADAS:
-        Radio_1     == float si finito, str si infinito
-        Radio_2     == float si finito, str si infinito
-        n_incidente == float
-        n_lente     == float
-        n_salida    == float
+        radio_1     == float si finito, str si infinito
+        radio_2     == float si finito, str si infinito
+        n_Incidente == float
+        n_Lente     == float
+        n_Salida    == float
     RETORNA:
         Matriz ABCD correspondiente
     '''
-    Matriz = Matriz_inicial()              #Se crea matriz identidad para empezar a trabajar
-    Poder_Lente = ((n_lente-n_incidente)/infinity(Radio_1)) + ((n_salida-n_lente)/infinity(Radio_2))
-    Matriz[0,1] = -Poder_Lente
+    matriz = matriz_Inicial()              #Se crea matriz identidad para empezar a trabajar
+    poder_Lente = ((n_Lente - n_Incidente)/infinity(radio_1)) + ((n_Salida - n_Lente)/infinity(radio_2))
+    matriz[0,1] = -poder_Lente
     '''
     |1  Poder_lente | Poder_lente = 1/f
     |0       1      |
     '''
-    return Matriz
+    return matriz
