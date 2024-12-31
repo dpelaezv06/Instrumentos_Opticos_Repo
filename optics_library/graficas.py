@@ -35,10 +35,10 @@ def fase(campo, ventana):
 
     ''' GRAFICAR '''
     plt.imshow(campo_Fase, extent = limites_eje, origin='lower', cmap='rainbow') #generamos la grafica
-    plt.colorbar(label="Intensidad") #agregamos la barra de color para representar la distribucion de fase
+    plt.colorbar(label="Fase") #agregamos la barra de color para representar la distribucion de fase
     plt.xlabel("X (m)") #ponemos etiquetas en los ejes
     plt.ylabel("Y (m)") #ponemos etiquetas en los ejes
-    plt.title("Mapa de Intensidad") #agregamos un titulo en el grafico
+    plt.title("Mapa de fase") #agregamos un titulo en el grafico
     plt.show() #mostramos el grafico
 
 

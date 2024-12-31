@@ -81,3 +81,7 @@ axes[1].set_ylabel("y' (mm)")
 fig.colorbar(im_salida, ax=axes[1], label="Intensidad")  # Barra de color para el plano de difracción
 '''
 
+malla_X, malla_Y = opt.malla_Puntos(1024, 5E-3)
+mascara = opt.funcion_Circulo(0.25E-3, None, malla_X, malla_Y)
+campo = espectro_angular(mascara, 5E-3, 0.1, 533E-9)
+graf.fase(campo, 5E-3)
