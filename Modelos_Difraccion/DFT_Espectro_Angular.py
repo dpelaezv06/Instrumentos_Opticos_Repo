@@ -15,7 +15,8 @@ Estos son los paso que se van a desarrollar para  conseguir la difracción por e
 import numpy as np #numpy para usar funciones matematicas
 import scipy as sc #scipy para obtener constantes cientificas
 import matplotlib.pyplot as plt #matplotlib para graficar funciones
-import libraries.optics_library as opt
+import optics_library.mascaras as opt
+import optics_library.dft as dft
 import time
 
 ########################## CUIDADO!!!!! SOLO FUNCIONA CON VENTANAS CUADRADAS Y MUESTREOS UNIFORMES #######################'''
@@ -32,13 +33,13 @@ Distancia_z = 20                                        #Distancia al plano de o
 
 '''Funciones para calcular la difracción '''
 deltas = opt.producto_EspacioFrecuencia(ventana, resolucion)                                #Regresa los delta espacio, frecuencia en un diccionario
-X_in, Y_in = opt.mascaras.malla_Puntos(resolucion, ventana)                                          #Se prepara una malla de puntos para la máscara
-X_espectre, Y_espectre = opt.mascaras.malla_Puntos(resolucion, resolucion*deltas["Delta_F"])         #Se crea una malla de puntos para el espectro
+X_in, Y_in = opt.malla_Puntos(resolucion, ventana)                                          #Se prepara una malla de puntos para la máscara
+X_espectre, Y_espectre = opt.malla_Puntos(resolucion, resolucion*deltas["Delta_F"])         #Se crea una malla de puntos para el espectro
 mascara = opt.funcion_Circulo(radio, None, X_in,Y_in)                                       #Se crea la mascara de un círculo, este va a ser el Campo U[x,y,0] de entrada
-espectro_0 = (deltas["Delta_X"]**2) * opt.dftshift2(opt.dft2(mascara))                 #Se calcula   la A[x,y,0]
+espectro_0 = (deltas["Delta_X"]**2) * dft.dftshift2(dft.dft2(mascara))                 #Se calcula   la A[x,y,0]
 termino_propagante = np.exp(1j*Distancia_z*numero_onda*np.sqrt(1-((longitud_onda**2) * ((X_espectre**2) + (Y_espectre**2)))))
 espectro_propagante = espectro_0 * termino_propagante                                       #Calculamos el espectro A[x,y,z]
-Campo_Propagante = (deltas["Delta_F"]**2) * opt.idft2(espectro_propagante) #Calculamos el campo U[x,y,z] y lo shifteamos
+Campo_Propagante = (deltas["Delta_F"]**2) * dft.idft2(espectro_propagante) #Calculamos el campo U[x,y,z] y lo shifteamos
 intensidad_Salida = np.abs(Campo_Propagante)**2
 
 ''' GRAFICAS '''

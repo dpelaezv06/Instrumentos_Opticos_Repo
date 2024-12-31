@@ -28,7 +28,7 @@ radio = 1E-3                                               #Radio de 1.5mm para 
 Distancia_z = 15E-3                                     #Distancia al plano de observación en mm
 '''
 
-def espectro_angular(mascara, ventana, Distancia_z, longitud_onda = 632.8E-9):
+def espectro_angular(mascara, ventana, Distancia_z, longitud_onda):
     '''
     Esta función calcula la difracción a través del método de espectro angular.
     ENTRADAS:

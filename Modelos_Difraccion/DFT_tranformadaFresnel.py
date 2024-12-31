@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
-import diffraction_library as diff
+import optics_library.mascaras as opt
+import optics_library.dft as dft
 import time
 
 ''' FUNCIONES PROPIAS DEL PROGRAMA'''
@@ -27,9 +28,9 @@ distancia_Propagacion = 0.5      #distancia entre plano de mascara y plano de ob
 #Relativas a la malla de puntos y la disposicion de la mascara
 ventana = 0.05
 resolucion = 2040
-xx_Entrada, yy_Entrada = diff.malla_Puntos(resolucion, ventana)
+xx_Entrada, yy_Entrada = opt.malla_Puntos(resolucion, ventana)
 #mascara = pts.funcion_Rectangulo(3E-3,3E-3,None,xx_Entrada,yy_Entrada)
-mascara = diff.funcion_Circulo(1E-3, None, xx_Entrada, yy_Entrada)  
+mascara = opt.funcion_Circulo(1E-3, None, xx_Entrada, yy_Entrada)  
 
 ''' Calculo de los terminos que intervienen en el modelo de difraccion por transformada de fresnel '''
 numero_Onda = 2*np.pi / longitud_Onda       #numero de onda
@@ -39,15 +40,15 @@ fase_Constante = ((np.exp(1j * numero_Onda * distancia_Propagacion)) / (1j * lon
 ''' calculo de las coordenadas del plano de salida usando el producto espacio frecuencia modificado para la transformada de fresnel '''
 deltas_Espacio = producto_EspacioFrecuenciaFresnel(longitud_Onda, distancia_Propagacion, ventana, resolucion) #calculamos los deltas del producto espacio frecuencia del 
 longitud_VentanaSalida = resolucion * deltas_Espacio["delta_Llegada"]
-xx_Salida, yy_Salida = diff.malla_Puntos(resolucion, longitud_VentanaSalida)
+xx_Salida, yy_Salida = opt.malla_Puntos(resolucion, longitud_VentanaSalida)
 
 ''' termino de la fase parabolica en el plano de salida '''
 fase_ParabolicaSalida = np.exp((1j * (numero_Onda / 2 * distancia_Propagacion) * ((xx_Salida ** 2) + (yy_Salida ** 2)))) #calculo de la fase parabolica en el plano de salida usando las coordenadas calculados en el plano de salida
 
 ''' operaciones para obtener el campo de salida '''
 campo_EntradaParabolico = mascara * fase_ParabolicaEntrada #preparamos el campo de entrada para meterlo a la fft
-campo_SalidaSinEscalar = diff.dft2(campo_EntradaParabolico) #calculamos la fft del campo de entrada multiplicado por la fase parabolica
-campo_Salida = diff.dftshift2(campo_SalidaSinEscalar) * (deltas_Espacio["delta_Salida"] ** 2) * fase_Constante * fase_ParabolicaSalida #escalamos el campo de salida con las constantes
+campo_SalidaSinEscalar = dft.dft2(campo_EntradaParabolico) #calculamos la fft del campo de entrada multiplicado por la fase parabolica
+campo_Salida = dft.dftshift2(campo_SalidaSinEscalar) * (deltas_Espacio["delta_Salida"] ** 2) * fase_Constante * fase_ParabolicaSalida #escalamos el campo de salida con las constantes
 
 intensidad_Salida = (np.abs(campo_Salida)) ** 2 #calculamos el patron de difraccion sacando modulo cuadrado
 
