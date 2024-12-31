@@ -15,6 +15,7 @@ Estos son los paso que se van a desarrollar para  conseguir la difracción por e
 import numpy as np #numpy para usar funciones matematicas
 import matplotlib.pyplot as plt #matplotlib para graficar funciones
 import optics_library.mascaras as opt
+import optics_library.graficas as graf
 
 ########################## CUIDADO!!!!! SOLO FUNCIONA CON VENTANAS CUADRADAS Y MUESTREOS UNIFORMES #######################'''
 
@@ -49,9 +50,9 @@ def espectro_angular(mascara, ventana, distancia_Propagacion, longitud_Onda):
     termino_propagante = np.exp(1j*distancia_Propagacion*numero_onda*np.sqrt(1-((longitud_Onda**2) * ((X_espectre**2) + (Y_espectre**2)))))
     espectro_propagante = espectro_0 * termino_propagante                                       #Calculamos el espectro A[x,y,z]
     Campo_Propagante = (deltas["Delta_F"]**2) * np.fft.ifft2(espectro_propagante)               #Calculamos el campo U[x,y,z] y lo shifteamos
-    intensidad_Salida = np.abs(Campo_Propagante)**2
+    #intensidad_Salida = np.abs(Campo_Propagante)**2
 
-    ''' GRAFICAS '''
+    ''' GRAFICAS 
     fig, axes = plt.subplots(1, 2, figsize=(12, 6))  # Crear dos subgráficos (uno para el plano de abertura y otro para el plano de salida)
 
     # Gráfico del plano de la abertura
@@ -68,8 +69,8 @@ def espectro_angular(mascara, ventana, distancia_Propagacion, longitud_Onda):
     axes[1].set_ylabel("y' (mm)")
     fig.colorbar(im_salida, ax=axes[1], label="Intensidad")  # Barra de color para el plano de difracción
     plt.tight_layout()
-    plt.show()
-    return
+    plt.show() '''
+    return Campo_Propagante
 
 '''
 # Gráfico de la función de transferencia
@@ -79,3 +80,4 @@ axes[1].set_xlabel("x' (mm)")
 axes[1].set_ylabel("y' (mm)")
 fig.colorbar(im_salida, ax=axes[1], label="Intensidad")  # Barra de color para el plano de difracción
 '''
+
