@@ -11,8 +11,8 @@ import numpy as np
 '''Funcion para el caso de radios infinitos'''
 def infinity(Radio):
     try:
-        R = float(R)        #Intenta transformar el radio a un float
-        return R
+        Radio = float(Radio)        #Intenta transformar el radio a un float
+        return Radio
     except:
         return np.inf       #Si el usuario pone algo como inf, entonces se hace infinito (Sirve para cualquier str)
 
@@ -21,7 +21,7 @@ def Matriz_inicial():
     return np.eye(2)        #Se crea una matriz identidad para inciar a trabajar
 
 '''Matriz de Refracción'''
-def Matriz_refraccion(Radio, n_incidente, n_transmitido):
+def Refraccion(Radio, n_incidente, n_transmitido):
     '''
     Función para calcular la matriz correspondiente a una interfase que se refracta
     ENTRADAS:
@@ -42,7 +42,7 @@ def Matriz_refraccion(Radio, n_incidente, n_transmitido):
     return Matriz
 
 '''Matriz de Reflexión'''
-def Matriz_reflexion(Radio, n_medio):
+def Reflexion(Radio, n_medio):
     '''
     Función para calcular la matriz correspondiente a un interfase que refleja
     ENTRADAS:
@@ -61,7 +61,7 @@ def Matriz_reflexion(Radio, n_medio):
     return Matriz
 
 '''Matriz de Traslacion entre vértices'''
-def Matriz_traslacion_entre_vertices(Distancia, n_medio):
+def Traslacion_entre_vertices(Distancia, n_medio):
     '''
     Función para calcular la matriz correspondiente a una traslación
     ENTRADAS:
@@ -79,15 +79,37 @@ def Matriz_traslacion_entre_vertices(Distancia, n_medio):
     return Matriz
 
 '''Matriz de traslación objeto - vértice'''
-def Matriz_traslacion_objeto_vertice(Distancia, n_medio):
+def Traslacion_objeto_vertice(Distancia, n_medio):
     '''
     Funcion para calcular la transferencia entre el objeto y el primer vértice
     ENTRADAS:
-    Distancia == float
-    n_medio   == float
+        Distancia == float
+        n_medio   == float
     RETORNA:
-    Matriz que da cuenta de la transferencia
+        Matriz que da cuenta de la transferencia
     '''
     Matriz = Matriz_inicial()             #Se crea matriz identidad para empezar a trabajar
     Matriz[1,0] = Distancia / n_medio     #Se asigna el valor adecuado en la posición correspondiente
+    return Matriz
+
+'''Matriz de una lente delgada'''
+def Lente_delgada(Radio_1, Radio_2 , n_incidente, n_lente, n_salida, tamaño_fisico = None):
+    '''
+    Función para calcular la matriz ABCD de un lente delgado
+    ENTRADAS:
+        Radio_1     == float si finito, str si infinito
+        Radio_2     == float si finito, str si infinito
+        n_incidente == float
+        n_lente     == float
+        n_salida    == float
+    RETORNA:
+        Matriz ABCD correspondiente
+    '''
+    Matriz = Matriz_inicial()              #Se crea matriz identidad para empezar a trabajar
+    Poder_Lente = ((n_lente-n_incidente)/infinity(Radio_1)) + ((n_salida-n_lente)/infinity(Radio_2))
+    Matriz[0,1] = -Poder_Lente
+    '''
+    |1  Poder_lente | Poder_lente = 1/f
+    |0       1      |
+    '''
     return Matriz
