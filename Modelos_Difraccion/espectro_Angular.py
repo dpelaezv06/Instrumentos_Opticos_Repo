@@ -49,7 +49,7 @@ def espectro_angular(mascara, ventana, distancia_Propagacion, longitud_Onda):
     espectro_0 = (deltas["Delta_X"]**2) * np.fft.fftshift(np.fft.fft2(mascara))                 #Se calcula   la A[x,y,0]
     termino_propagante = np.exp(1j*distancia_Propagacion*numero_onda*np.sqrt(1-((longitud_Onda**2) * ((X_espectre**2) + (Y_espectre**2)))))
     espectro_propagante = espectro_0 * termino_propagante                                       #Calculamos el espectro A[x,y,z]
-    Campo_Propagante = (deltas["Delta_F"]**2) * np.fft.ifft2(espectro_propagante)               #Calculamos el campo U[x,y,z] y lo shifteamos
+    campo_Propagante = (deltas["Delta_F"]**2) * np.fft.ifft2(espectro_propagante)               #Calculamos el campo U[x,y,z] y lo shifteamos
     #intensidad_Salida = np.abs(Campo_Propagante)**2
 
     ''' GRAFICAS 
@@ -70,7 +70,7 @@ def espectro_angular(mascara, ventana, distancia_Propagacion, longitud_Onda):
     fig.colorbar(im_salida, ax=axes[1], label="Intensidad")  # Barra de color para el plano de difracción
     plt.tight_layout()
     plt.show() '''
-    return Campo_Propagante
+    return campo_Propagante
 
 '''
 # Gráfico de la función de transferencia
@@ -81,7 +81,3 @@ axes[1].set_ylabel("y' (mm)")
 fig.colorbar(im_salida, ax=axes[1], label="Intensidad")  # Barra de color para el plano de difracción
 '''
 
-malla_X, malla_Y = opt.malla_Puntos(1024, 5E-3)
-mascara = opt.funcion_Circulo(0.25E-3, None, malla_X, malla_Y)
-campo = espectro_angular(mascara, 5E-3, 0.1, 533E-9)
-graf.fase(campo, 5E-3)
