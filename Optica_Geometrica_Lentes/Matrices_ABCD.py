@@ -127,5 +127,3 @@ def lente_Delgada(radio_1, radio_2, n_Incidente, n_Lente, n_Salida, tamaño_Fisi
     |Poder_lente      1  |
     '''
     return matriz
-
-print(lente_Delgada(-0.03, 0.03, None, None, None))
