@@ -66,7 +66,7 @@ Modelos_Difraccion.espectro_Angular
                 ventana == tamaño de la ventana de observación
                 Distancia_z == Distancia que se propaga el espectro desde que choca con la mascara
             RETORNA:
-                Ventana emergente con el gráfico que representa la difracción
+                Campo óptico complejo difractado
 
 Modelos_Difraccion.Inverso_Espectro_Angular
     Compleja_Antipropagante(Ruta_Campo_Real,Ruta_Campo_Complejo, Distancia_z, Tamaño_pixel, longitud_onda = 632.8E-9)
@@ -78,7 +78,7 @@ Modelos_Difraccion.Inverso_Espectro_Angular
             Distancia_z == float , Distancia que se desea antipropagar el campo complejo
             Tamaño_pixel == float , Tamaño físico del píxel de la imagen del campo proporcionado
         RETORNA:
-            Gráfico con el campo complejo antipropagado
+            Campo Complejo antipropagado
     Intensidad_Antipropagante(Ruta_Campo_Intensidades, Distancia_z, Tamaño_pixel, longitud_onda = 632.8E-9)
         A partir de una imagen en escala de grises que representan la intensidad medida se obtiene la
         antipropagación a través del método de espectro angular
@@ -87,4 +87,4 @@ Modelos_Difraccion.Inverso_Espectro_Angular
             Distancia_z == float , Distancia que se desea antipropagar el campo complejo
             Tamaño_pixel == float , Tamaño físico del píxel de la imagen del campo proporcionado
         RETORNA:
-            Gráfico con el campo de intensidades antipropagado
+            Campo de intensidades antipropagado
