@@ -28,7 +28,7 @@ radio = 1E-3                                               #Radio de 1.5mm para 
 Distancia_z = 15E-3                                     #Distancia al plano de observación en mm
 '''
 
-def espectro_angular(mascara, ventana, Distancia_z, longitud_onda):
+def espectro_angular(mascara, ventana, distancia_Propagacion, longitud_Onda):
     '''
     Esta función calcula la difracción a través del método de espectro angular.
     ENTRADAS:
@@ -41,12 +41,12 @@ def espectro_angular(mascara, ventana, Distancia_z, longitud_onda):
     
     '''Funciones para calcular la difracción '''
     resolucion = len(mascara)
-    numero_onda = 2*np.pi/longitud_onda
+    numero_onda = 2*np.pi/longitud_Onda
     deltas = opt.producto_EspacioFrecuencia(ventana, resolucion)                                #Regresa los delta espacio, frecuencia en un diccionario
     X_in, Y_in = opt.malla_Puntos(resolucion, ventana)                                          #Se prepara una malla de puntos para la máscara                              
     X_espectre, Y_espectre = opt.malla_Puntos(resolucion, resolucion*deltas["Delta_F"])         #Se crea una malla de puntos para el espectro
     espectro_0 = (deltas["Delta_X"]**2) * np.fft.fftshift(np.fft.fft2(mascara))                 #Se calcula   la A[x,y,0]
-    termino_propagante = np.exp(1j*Distancia_z*numero_onda*np.sqrt(1-((longitud_onda**2) * ((X_espectre**2) + (Y_espectre**2)))))
+    termino_propagante = np.exp(1j*distancia_Propagacion*numero_onda*np.sqrt(1-((longitud_Onda**2) * ((X_espectre**2) + (Y_espectre**2)))))
     espectro_propagante = espectro_0 * termino_propagante                                       #Calculamos el espectro A[x,y,z]
     Campo_Propagante = (deltas["Delta_F"]**2) * np.fft.ifft2(espectro_propagante)               #Calculamos el campo U[x,y,z] y lo shifteamos
     intensidad_Salida = np.abs(Campo_Propagante)**2
