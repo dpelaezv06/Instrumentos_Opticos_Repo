@@ -3,6 +3,7 @@ En este documento se recoge la totalidad de las funciones disponibles a lo largo
 MODULOS
 1. optics_libray
 2. Modelos_Difraccion
+3. Optica_Geometrica_Lentes
 
 FUNCIONES POR MODULO
 optics_libray.mascaras
@@ -88,3 +89,57 @@ Modelos_Difraccion.Inverso_Espectro_Angular
             Tamaño_pixel == float , Tamaño físico del píxel de la imagen del campo proporcionado
         RETORNA:
             Campo de intensidades antipropagado
+
+Optica_Geometrica_Lentes.Matrices_ABCD
+    refraccion(radio, n_Incidente, n_Transmitido)
+        Función para calcular la matriz correspondiente a una interfase que se refracta
+        ENTRADAS:
+            radio         == float (si es finito), str (si se quiere un infinito)
+            n_Incidente   == float
+            n_Transmitido == float
+            Todas estas son propiedades físicas de la interfase
+        RETORNA:
+            Matriz correspondiente a la transformación que genera la interfase
+    reflexion(radio, n_Medio)
+        Función para calcular la matriz correspondiente a un interfase que refleja
+        ENTRADAS:
+            radio   == float (si es finito), str (si se quiere un infinito), tome en cuenta que debe estar con el signo adecuado dependiendo de la concavidad
+            n_Medio == float 
+            Todas estas son propiedades físicas de la interfase
+        RETORNA:
+            Matriz correspondiente a la transformación que genera la interfase
+    Traslacion_EntreVertices(distancia, n_Medio)
+        Función para calcular la matriz correspondiente a una traslación
+        ENTRADAS:
+            n_medio   == float 
+            distancia == float
+        RETORNA:
+            Matriz que da cuenta de la traslación entre vértices
+    lente_Delgada(radio_1, radio_2 , n_Incidente, n_Lente, n_Salida, tamaño_Fisico = None)
+        Función para calcular la matriz ABCD de un lente delgado
+        ENTRADAS:
+            radio_1     == float si finito, str si infinito
+            radio_2     == float si finito, str si infinito
+            n_Incidente == float
+            n_Lente     == float
+            n_Salida    == float
+        RETORNA:
+            Matriz ABCD correspondiente
+
+Optica_Geometrica_Lentes.Sistema_Optico
+    formacion_Imagenes(distancia_Objeto , n_Objeto, n_Imagen)
+        Esta función se debe modificar para el sistema óptico que requiera implementar, esto con el fin de evitar la necesidad
+        de digitar todo el tiempo lo que se requiera.
+        En el archivo encontrará  una sección en donde se deben acomodar las interfases en el órden estándar de un
+        sistema óptico; izquierda a derecha.
+        ENTRADAS:
+            distancia_Objeto == float 
+            n_Objeto         == float, 1 por defecto
+            n_Imagen         == float, 1 por defecto
+        RETORNA:
+            diccionario con las variables de interes, se accede con:
+            "Magnificacion_lateral"
+            "Magnificacion_angular"
+            "Distancia_vertice_imagen"
+            "foco_sistema"
+            "Matriz_Sistema"

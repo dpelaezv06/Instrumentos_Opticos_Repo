@@ -12,8 +12,6 @@ Estos son los paso que se van a desarrollar para  conseguir la difracción por e
 
 ''' LIBRERIAS USADAS EN EL CODIGO '''
 import numpy as np #numpy para usar funciones matematicas
-import scipy as sc #scipy para obtener constantes cientificas
-import matplotlib.pyplot as plt #matplotlib para graficar funciones
 import optics_library.mascaras as diff
 
 ########################## CUIDADO!!!!! SOLO FUNCIONA CON VENTANAS CUADRADAS Y MUESTREOS UNIFORMES #######################

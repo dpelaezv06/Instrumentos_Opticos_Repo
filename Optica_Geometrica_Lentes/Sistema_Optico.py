@@ -10,7 +10,25 @@ distancia_Objeto = 200 #mm
 n_Objeto = 1
 n_Imagen = 1
 
-def formacion_Imagenes(distancia_Objeto , n_Objeto, n_Imagen):
+def formacion_Imagenes(distancia_Objeto , n_Objeto = 1, n_Imagen = 1):
+    '''
+    Esta función se debe modificar para el sistema óptico que requiera implementar, esto con el fin de evitar la necesidad
+    de digitar todo el tiempo lo que se requiera.
+    En el archivo encontrará  una sección en donde se deben acomodar las interfases en el órden estándar de un
+    sistema óptico; izquierda a derecha.
+    ENTRADAS:
+        distancia_Objeto == float 
+        n_Objeto         == float, 1 por defecto
+        n_Imagen         == float, 1 por defecto
+    RETORNA:
+        diccionario con las variables de interes, se accede con:
+        "Magnificacion_lateral"
+        "Magnificacion_angular"
+        "Distancia_vertice_imagen"
+        "foco_sistema"
+        "Matriz_Sistema"
+    '''
+    
     matriz_Sistema = matriz_Inicial()   #Matriz identidad para empezar a trabajar
     
     '''En esta sección irán sus interfases, ingreselas en la lista:'''  
@@ -36,26 +54,22 @@ def formacion_Imagenes(distancia_Objeto , n_Objeto, n_Imagen):
         matriz_Sistema = elemento @ matriz_Sistema #Pura multiplicación matricial   
         
     '''Ahora, recogemos los parámetros necesarios de la matriz del sistema'''
-    poder_Sistema = - matriz_Sistema[0,1]
-    distancia_H_V = (n_Objeto/matriz_Sistema[0,1]) * (1-matriz_Sistema[0,0])                    # Desde el plano principal H hasta el primer vértice V  ; HV
-    distancia_H_prima_V_prima = (n_Imagen/matriz_Sistema[0,1]) * (1 - matriz_Sistema[1,1])      # Desde el plano principal H' hasta el último vértice V'; H'V'
-    distancia_Objeto_H = distancia_Objeto - distancia_H_V                                       # Desde el objeto hasta el plano principal H            ; OH
-    distancia_H_prima_Imagen = n_Imagen/(poder_Sistema-(n_Objeto/distancia_Objeto_H))           # Desde el plano H' hasta la imagen                     ; H'I
-    magnificacion_Lateral = - distancia_Objeto_H / distancia_H_prima_Imagen                     # m_x
-    magnificacion_Angular = - n_Objeto/n_Imagen * distancia_H_prima_Imagen/distancia_Objeto_H   # m_alfa
-    distancia_Vertice_Imagen = distancia_H_prima_V_prima + distancia_H_prima_Imagen             # Desde el último vértice hasta la imágen               ; V'I
     
-    '''Aclaración, la teoría de planos principales toma en cuenta un par de planos que simulan una lente delgada, por lo tanto,
-    toda teoría en la que se usen lentes delgadas es válida sobre los planos principales, mucho ojo porque los planos están
-    separados, no unidos'''
-    
-    propiedades_Sistema = {"Distancia_H_V":distancia_H_V,"Distancia_H_prima_V_prima":distancia_H_prima_V_prima,
-                           "Distancia_objeto_H":distancia_Objeto_H, "Distancia_H_prima_imagen":distancia_H_prima_Imagen,
-                           "Magnificacion_lateral": magnificacion_Lateral,"Magnificacion_angular ":magnificacion_Angular,
-                           "Distancia_vertice_imagen" : distancia_Vertice_Imagen}
+    poder_Sistema = - matriz_Sistema[1,0]
+    foco_Sistema = 1/poder_Sistema
+    distancia_PlanoPrincipalVerticeEntrada = (n_Objeto/matriz_Sistema[1,0]) * (1-matriz_Sistema[0,0])                          # Desde el plano principal H hasta el primer vértice V  ; HV
+    distancia_PlanoPrincipalVerticeSalida = (n_Imagen/matriz_Sistema[1,0]) * (1 - matriz_Sistema[1,1])                         # Desde el plano principal H' hasta el último vértice V'; H'V'
+    distancia_ObjetoPlanoPrincipalEntrada = distancia_Objeto - distancia_PlanoPrincipalVerticeEntrada                          # Desde el objeto hasta el plano principal H            ; OH
+    distancia_PlanoPrincipalSalidaImagen = n_Imagen/(poder_Sistema-(n_Objeto/distancia_ObjetoPlanoPrincipalEntrada))           # Desde el plano H' hasta la imagen                     ; H'I
+    magnificacion_Lateral = - distancia_ObjetoPlanoPrincipalEntrada / distancia_PlanoPrincipalSalidaImagen                     # m_x
+    magnificacion_Angular = - n_Objeto/n_Imagen * distancia_PlanoPrincipalSalidaImagen/distancia_ObjetoPlanoPrincipalEntrada   # m_alfa
+    distancia_VerticeImagen = distancia_PlanoPrincipalVerticeSalida + distancia_PlanoPrincipalSalidaImagen                    # Desde el último vértice hasta la imágen               ; V'I
     
     '''Este diccionario contiene todas las posibles variables de interés'''
+        
+    propiedades_Sistema = {"Magnificacion_lateral": magnificacion_Lateral,
+                           "Magnificacion_angular":magnificacion_Angular,
+                           "Distancia_vertice_imagen" : distancia_VerticeImagen,
+                           "foco_sistema": foco_Sistema,
+                           "Matriz_Sistema": matriz_Sistema}
     return propiedades_Sistema
-
-Propiedades = formacion_Imagenes(distancia_Objeto, n_Objeto, n_Imagen)
-print(Propiedades)
