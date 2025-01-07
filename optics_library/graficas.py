@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-def intensidad(campo, ventana):
+def intensidad(campo, ventana, min=0, max=1):
     ''' Grafica un patron de intensidad del campo ingresado    
     ENTRADAS:
     - campo: campo optico al que se le quiere representar su intensidad
@@ -14,7 +14,7 @@ def intensidad(campo, ventana):
     campo_Intensidad = (np.abs(campo))**2 #calculamos la intensidad del campo que se ponga en la entrada
 
     ''' GRAFICAR '''
-    plt.imshow(campo_Intensidad, extent = limites_eje, origin='lower', cmap='gray') #generamos la grafica
+    plt.imshow(campo_Intensidad, extent = limites_eje, origin='lower', cmap='gray', vmin= min*np.max(campo_Intensidad) , vmax=max*np.max(campo_Intensidad)) #generamos la grafica
     plt.colorbar(label="Intensidad") #agregamos la barra de color para representar la intensidad
     plt.xlabel("X (m)") #ponemos etiquetas en los ejes
     plt.ylabel("Y (m)") #ponemos etiquetas en los ejes
@@ -41,3 +41,26 @@ def fase(campo, ventana):
     plt.title("Mapa de fase") #agregamos un titulo en el grafico
     plt.show() #mostramos el grafico
 
+def intensidad_EjeX(campo, ventana):
+    """
+    Grafica la intensidad en función de la posición en el eje X, utilizando una ventana de tamaño específico.
+    ENTRADAS:
+        campo == Array NumPy 2D que contiene los datos de intensidad.
+        ventana == Float que representa el tamaño de la ventana en las unidades deseadas.
+    RETORNA:
+        Gráfico Intensidad vs posición en el eje X
+    """
+    campo = np.abs(campo)**2                                #Para obtener la intensidad    
+    fila_central = campo.shape[0] // 2                      # Seleccionar la fila central para graficar
+    intensidades_X = campo[fila_central, :]                 # Obtener los valores de intensidad de la fila central
+    num_puntos_a_graficar = int(intensidades_X.shape[0])    # Calcular el número de puntos a graficar
+    # Crear una lista de posiciones en el eje x
+    # Asumimos que el centro de la ventana coincide con el centro de la fila
+    posiciones_X = np.linspace(-ventana/2, ventana/2, num_puntos_a_graficar)
+    # Graficas
+    plt.plot(posiciones_X, intensidades_X[:num_puntos_a_graficar])
+    plt.xlabel('Posición (m)')
+    plt.ylabel('Intensidad')
+    plt.title('Intensidad vs. Posición')
+    plt.show()
+        

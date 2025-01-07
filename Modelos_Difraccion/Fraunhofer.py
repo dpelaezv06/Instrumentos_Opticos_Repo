@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import optics_library.mascaras as opt
 
-def fraunhofer(mascara, ventana, distancia_Propagacion, longitud_Onda):
+def fraunhofer(mascara, ventana, distancia_Propagacion, longitud_Onda = 632.8E-9):
     ''' Funcion que realiza el calculo del campo optico usando la aproximacion de Fraunhofer 
     ENTRADAS:
     - mascara: Puntos presentes en la mascara a travez de la cual se va a difractar

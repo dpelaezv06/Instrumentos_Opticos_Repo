@@ -32,7 +32,6 @@ def Intensidad_Antipropagante(Ruta_Campo_Intensidades, Distancia_z, Tamaño_pixe
     resolucion = len(Intensidad_Medida)                                                          #Se adquiere la resolución de la imagen de entrada
     ventana = resolucion * Tamaño_pixel                                                          #Se calcula el tamaño de la ventana
     deltas = diff.producto_EspacioFrecuencia(ventana, resolucion)                                #Regresa los delta espacio, frecuencia en un diccionario
-    X_in, Y_in = diff.malla_Puntos(resolucion, ventana)                                          #Se prepara una malla de puntos para la máscara
     X_espectre, Y_espectre = diff.malla_Puntos(resolucion, resolucion*deltas["Delta_F"])         #Se crea una malla de puntos para el espectro
     Campo_Amplitud = np.sqrt(Intensidad_Medida)                                                  #Obtenemos el campo de amplitudes a partir del campo de intensidades
     Espectro_propagante = np.fft.fftshift(np.fft.fft2(Campo_Amplitud)) / (deltas["Delta_F"]**2)  #Campo A[p,q,z], este es el campo que se propaga, tener en cuenta que ya está multiplicado por una exponencial compleja de la cual desconocemos su valor de z
@@ -61,7 +60,6 @@ def Compleja_Antipropagante(Ruta_Campo_Real,Ruta_Campo_Complejo, Distancia_z, Ta
     resolucion = len(Parte_Real)                                                                 #Se adquiere la resolución de la imagen de entrada
     ventana = resolucion * Tamaño_pixel                                                          #Se calcula el tamaño de la ventana
     deltas = diff.producto_EspacioFrecuencia(ventana, resolucion)                                #Regresa los delta espacio, frecuencia en un diccionario
-    X_in, Y_in = diff.malla_Puntos(resolucion, ventana)                                          #Se prepara una malla de puntos para la máscara
     X_espectre, Y_espectre = diff.malla_Puntos(resolucion, resolucion*deltas["Delta_F"])         #Se crea una malla de puntos para el espectro
     Campo_Complejo = Parte_Real + 1j*Parte_Imaginaria                                            #Campo Complejo completo U[n,m,z]
     Espectro_propagante = np.fft.fftshift(np.fft.fft2(Campo_Complejo)) / (deltas["Delta_F"]**2)  #Campo A[p,q,z], este es el campo que se propaga, tener en cuenta que ya está multiplicado por una exponencial compleja de la cual desconocemos su valor de z

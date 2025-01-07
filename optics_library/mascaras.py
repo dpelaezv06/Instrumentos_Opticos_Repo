@@ -3,6 +3,7 @@ import numpy as np
 import tkinter as tk
 from tkinter import filedialog
 import cv2
+import random
 
 '''Funciones para creación de máscaras'''
 
@@ -32,13 +33,14 @@ def funcion_punto_3(m, L, xx): # Función que retorna un array con la transmitan
     transmitancia = (1 / 2) + (m / 2) * (np.cos(2 * np.pi * xx / L))
     return transmitancia
 
-def funcion_Circulo(radio, centro, xx, yy): #definicion de la funcion para hacer un circulo transparente en una malla ded puntos
+def funcion_Circulo(radio, centro, xx, yy, opacidad = 1): #definicion de la funcion para hacer un circulo transparente en una malla de puntos
     ''' 
     Crea una máscara con un círculo 
     ENTRADAS:
         radio == radio de circunferencia
         centro == array con las coordenadas espaciales del centro de la circunferencia
         xx, yy == malla de puntos bidimensional en la cual se crea la circunferencia
+        opacidad == valor de la transmitancia dentro del círculo
     RETORNA:
         Mascara con un círculo (Claramente)
     '''
@@ -46,7 +48,7 @@ def funcion_Circulo(radio, centro, xx, yy): #definicion de la funcion para hacer
     if centro is None: # que pasa si el centro no es definido en la funcion
         centro = [0, 0] #ubica el centro de la circunferencia en el origen
     distancia = (xx - centro[0])**2 + (yy - centro[1])**2 #calculamos la distancia desde el centro de la circunferencia a cada punto
-    mascara = distancia <= radio**2 #los puntos de la mascara seran los puntos cuya distancia al centro es menor que el radio
+    mascara = np.where(distancia <= radio**2, opacidad, 0) #los puntos de la mascara seran los puntos cuya distancia al centro es menor que el radio
     return mascara #devolvemos los puntos que cumplen la condicion para hacer parte de la mascara
 
 def funcion_Rectangulo(base, altura, centro, xx, yy): #funcion para realizar una funcion rectangulo
@@ -112,3 +114,89 @@ def img_to_array(ruta):
     array_grises = cv2.imread(ruta, cv2.IMREAD_GRAYSCALE)   #lee el array, asignando un valor de intensidad de gris a cada pixel
     array_intensidades = array_grises / 255                 #normaliza el valor de intensidad
     return  array_intensidades
+
+def random_Pinholes(no_Pinholes, radio , xx, yy , random_Phase = False):
+    '''
+    Funcion que crea una malla de pinholes distribuidos aleatoriamente
+    ENTRADA:
+        No_Pinholes == int      Cantidad de pinholes deseados
+        tamaño      == float    Tamaño de los pinholes
+        xx, yy      == meshgrid
+        random_Phase== Boolean  True si se desea incluir fase aleatoria
+    RETONRA
+        Mascara
+    '''
+    mascara = np.zeros_like(xx, dtype = np.complex128)  # Inicializamos la máscara con ceros
+    mascara_aux = np.zeros_like(xx, dtype = np.complex128)  # Máscara auxiliar para detectar superposiciones
+    longitud_fisica = xx[0][-1]- xx[0][0]
+    if random_Phase == False:
+        for pinhole in range(no_Pinholes):
+            while True:
+                # Generar centro aleatorio
+                centro_x = random.uniform(-longitud_fisica/2, longitud_fisica/2)
+                centro_y = random.uniform(-longitud_fisica/2, longitud_fisica/2)
+                centro_Pinholes = [centro_x, centro_y]
+
+                # Crear el pinhole temporalmente
+                pinhole_temp = funcion_Circulo(radio, centro_Pinholes, xx, yy)
+
+                # Verificar si hay superposición con agujeros anteriores
+                if np.sum(pinhole_temp * mascara_aux) == 0:
+                    # Si no hay superposición, agregar el pinhole a la máscara
+                    mascara += pinhole_temp
+                    mascara_aux += pinhole_temp
+                    break  # Salir del bucle while
+    else:
+        for pinhole in range(no_Pinholes):
+            while True:
+                # Generar centro aleatorio
+                centro_x = random.uniform(-longitud_fisica/2, longitud_fisica/2)
+                centro_y = random.uniform(-longitud_fisica/2, longitud_fisica/2)
+                fase = np.exp(1j * random.uniform(0, 2*np.pi))
+                
+                centro_Pinholes = [centro_x, centro_y]
+
+                # Crear el pinhole temporalmente
+                pinhole_temp = funcion_Circulo(radio, centro_Pinholes, xx, yy, fase)
+
+                # Verificar si hay superposición con agujeros anteriores
+                if np.sum(pinhole_temp * mascara_aux) == 0:
+                    # Si no hay superposición, agregar el pinhole a la máscara
+                    mascara += pinhole_temp
+                    mascara_aux += pinhole_temp
+                    break  # Salir del bucle while
+    return mascara
+
+def rejilla_AperturasCuadradas(no_rectangulos_por_mm, ventana, xx, yy):
+    '''
+    Crea una máscara con una rejilla de aperturas cuadradas utilizando la función funcion_Rectangulo.
+
+    ENTRADAS:
+        no_rectangulos_por_mm == Número de rectángulos por milímetro.
+        ventana == Tamaño total de la ventana en milímetros.
+        xx, yy  == Malla de puntos.
+
+    RETORNA:
+        Máscara numérica con la rejilla de aperturas
+    '''
+
+    # Calcular el tamaño de cada rectángulo en unidades de la malla
+    longitud_lado = 0.5 * 1 / (no_rectangulos_por_mm*1000) 
+    # Crear una máscara vacía
+    mascara = np.zeros_like(xx, dtype=float)
+
+    # Calcular el número de rectángulos por fila y columna
+    num_rectangulos = int(ventana * no_rectangulos_por_mm * 1000)
+
+    # Crear los centros de los rectángulos
+    centros_x = np.linspace(-ventana/2+2*longitud_lado, ventana/2-2*longitud_lado, num_rectangulos)
+    centros_y = np.linspace(-ventana/2+2*longitud_lado, ventana/2-2*longitud_lado , num_rectangulos)
+
+    # Crear la máscara iterando sobre los centros y utilizando funcion_Rectangulo
+    for x in centros_x:
+        for y in centros_y:
+            # Obtener la máscara del rectángulo
+            rectangulo_mascara = funcion_Rectangulo(longitud_lado, longitud_lado, [x, y], xx, yy)
+            # Sumar la máscara del rectángulo a la máscara total
+            mascara += rectangulo_mascara
+    return mascara
