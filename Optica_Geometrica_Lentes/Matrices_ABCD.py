@@ -8,19 +8,21 @@ Para simbolizar los rayos
 
 import numpy as np
 
+
 '''Funcion para el caso de radios infinitos'''
 def infinity(radio):
     try:
         radio = float(radio)        #Intenta transformar el radio a un float
-        return radio
-    except:
-        return np.inf       #Si el usuario pone algo como inf, entonces se hace infinito (Sirve para cualquier str)
+        return radio                #En caso de que lo logre, entonces se ha ingresado un numero, y retornamos dicho numero
+    except:                         #En caso contrario, el radio es infinito
+        return np.inf               #Si el usuario pone algo como inf, entonces se hace infinito (Sirve para cualquier str)
 
-'''Matriz de Entrada del sistema'''
+''' Matriz de Entrada del sistema '''
 def matriz_Inicial():
-    return np.eye(2)        #Se crea una matriz identidad para inciar a trabajar
+    matriz_Identidad = np.eye(2)        #Se crea una matriz identidad para inciar a trabajar
+    return matriz_Identidad             #Retornamos una matriz identidad 2x2 para realizar las matrices de transferencia de rayos
 
-'''Matriz de Refracción'''
+''' Matriz de Refracción '''
 def refraccion(radio, n_Incidente, n_Transmitido):
     '''
     Función para calcular la matriz correspondiente a una interfase que se refracta
@@ -32,14 +34,15 @@ def refraccion(radio, n_Incidente, n_Transmitido):
     RETORNA:
         Matriz correspondiente a la transformación que genera la interfase
     '''
+
+    ''' Asignacion de valores por default'''
     matriz = matriz_Inicial()                           # Creamos una matriz arbitraria para empezar a meter datos, fíjese que es identidad para facilitar las cosas
-    matriz[1,0] = -(n_Transmitido - n_Incidente)/ infinity(radio)  # Creamos la matriz refracción como debe ser
+    matriz[1,0] = -(n_Transmitido - n_Incidente)/ infinity(radio)  # Creamos la matriz refracción
     '''
-    | 1  0 |    
-    | -P 1 |
+    | 1    0 |    
+    | -P   1 |    Donde P es el poder de la interfase, P = (n_transmitido - n_incidente)/Radio
     '''
-    #Donde P es el poder de la interfas, P = (n_transmitido - n_incidente)/Radio
-    return matriz
+    return matriz #retornamos la matriz construida
 
 '''Matriz de Reflexión'''
 def reflexion(radio, n_Medio):
@@ -52,59 +55,51 @@ def reflexion(radio, n_Medio):
     RETORNA:
         Matriz correspondiente a la transformación que genera la interfase
     '''
-    matriz = matriz_Inicial()         #Se crea matriz identidad para empezar a trabajar
-    matriz[1,0] = 2*n_Medio / infinity(radio) #Se asigna el valor correspondiente al índice de la matriz
+
+
+    ''' valores por default para facilitar las cosas '''
+    if n_Medio is None:             #Valor por default para el indice del medio en el cual se produce la reflexion
+        n_Medio = 1                 #Si no se pone ningun valor, se asume que el espejo esta en el aire
+    if radio is None:               #Si el radio de curvatura esta vacio
+        radio = infinity("Inf")     #Se asume entonces que el espejo es plano
+
+    matriz = matriz_Inicial()                   #Se crea matriz identidad para empezar a trabajar
+    matriz[1,0] = 2*n_Medio / infinity(radio)   #Se asigna el valor correspondiente al índice de la matriz
     '''
     | 1         0 |    
     | 2*n_i/R   1 |
-    '''  
+    '''
     return matriz
 
 '''Matriz de Traslacion entre vértices'''
-def traslacion_EntreVertices(distancia, n_Medio):
+def propagacion(distancia, n_Medio = 1):
     '''
     Función para calcular la matriz correspondiente a una traslación
     ENTRADAS:
         n_medio   == float 
         distancia == float
     RETORNA:
-        Matriz que da cuenta de la traslación entre vértices
+        Matriz que da cuenta de la propagacion en un medio de indice de refraccion n
     '''
-    matriz = matriz_Inicial()           #Se crea matriz identidad para empezar a trabajar
-    matriz[0,1] = distancia/ n_Medio    #Se asigna el valor adecuado en la posición correspondiente
+    matriz = matriz_Inicial()               #Se crea matriz identidad para empezar a trabajar
+    matriz[0,1] = distancia / n_Medio       #Se asigna el valor del camino optico en la posición correspondiente
     ''' MATRIZ RESULTANTE:
-    |1   D/n|
+    |1   d/n|
     |0    1 |
     '''
-    return matriz
+    return matriz 
 
-'''Matriz de traslación objeto - vértice'''
-def traslacion_ObjetoVertice(distancia, n_Medio):
-    '''
-    Funcion para calcular la transferencia entre el objeto y el primer vértice
+def foco_LenteDelgada(radio_1, radio_2, n_Incidente, n_Lente, n_Salida,):
+    ''' Funcion que calcula la distancia focal de una lente delgada considerando sus caracteristicas fisicas 
     ENTRADAS:
-        distancia == float
-        n_medio   == float
-    RETORNA:
-        Matriz que da cuenta de la transferencia
-    '''
-    matriz = matriz_Inicial()             #Se crea matriz identidad para empezar a trabajar
-    matriz[0,1] = distancia / n_Medio     #Se asigna el valor adecuado en la posición correspondiente
-    return matriz
+    - radio_1: Radio de curvatura de la primera superficie
+    - radio_2: Radio de curvatura de la segunda superficie
+    - n_Incidente: indice de refraccion del medio anterior a la lente
+    - n_Lente: Indice de refraccion del lente (depende del material)
+    - n_Salida: Indice de refraccion del medio posterior a la lente
+    
+    RETORNA: Distancia focal de la lente con las caracteristicas ingresadas '''
 
-'''Matriz de una lente delgada'''
-def lente_Delgada(radio_1, radio_2, n_Incidente, n_Lente, n_Salida, tamaño_Fisico = None):
-    '''
-    Función para calcular la matriz ABCD de un lente delgado
-    ENTRADAS:
-        radio_1     == float si finito, str si infinito
-        radio_2     == float si finito, str si infinito
-        n_Incidente == float, por default es 1 (aire)
-        n_Lente     == float, por default es 1.5 (vidrio)
-        n_Salida    == float, por default es 1 (aire)
-    RETORNA:
-        Matriz ABCD correspondiente
-    '''
 
     ''' Definicion de valores por default para los indices de refraccion, se asume por default que la lente esta hecha de vidrio y que esta 
     inmersa en el aire
@@ -118,12 +113,89 @@ def lente_Delgada(radio_1, radio_2, n_Incidente, n_Lente, n_Salida, tamaño_Fisi
         n_Salida = 1 #Si no se define, entonces el indice de refraccion de salida es el del aire
     if n_Lente is None: #establecemos un valor por default para el indice de refraccion de los lentes en caso de que se deje vacio
         n_Lente = 1.5 #Asumimos por default que las lentes estan hechas de vidrio
-    
-    matriz = matriz_Inicial()              #Se crea matriz identidad para empezar a trabajar
+
     poder_Lente = ((n_Lente - n_Incidente)/infinity(radio_1)) + ((n_Salida - n_Lente)/infinity(radio_2)) #se calcula el poder de covergencia de la lente usando la ecuacion del fabricante de lentes
-    matriz[1,0] = -poder_Lente
+    distancia_Focal = 1/poder_Lente #calculamos la distancia focal usando el poder de la lente
+    return distancia_Focal #retornamos la distancia focal
+    
+
+
+
+'''Matriz de una lente delgada'''
+def lente_Delgada(distancia_Focal, tamaño_Fisico = None):
+    '''
+    Función para calcular la matriz ABCD de un lente delgado
+    ENTRADAS:
+        radio_1     == float si finito, str si infinito
+        radio_2     == float si finito, str si infinito
+        n_Incidente == float, por default es 1 (aire)
+        n_Lente     == float, por default es 1.5 (vidrio)
+        n_Salida    == float, por default es 1 (aire)
+    RETORNA:
+        Matriz ABCD correspondiente
+    '''
+    
+    matriz = matriz_Inicial()               #Se crea matriz identidad para empezar a trabajar
+    poder_Lente = 1/distancia_Focal         #Se calcula el poder de la lente usando la distancia focal
+    matriz[1,0] = -poder_Lente              #Introducimos el valor correspondiente en la matriz de la lente
     '''
     |1                0  | Poder_lente = 1/f
     |Poder_lente      1  |
     '''
-    return matriz
+    return matriz #retornamos la matriz
+
+def sistema_Optico(interfases, distancia_Objeto, n_Objeto, n_Imagen):
+    '''
+    Esta función se debe modificar para el sistema óptico que requiera implementar, esto con el fin de evitar la necesidad
+    de digitar todo el tiempo lo que se requiera.
+    En el archivo encontrará  una sección en donde se deben acomodar las interfases en el órden estándar de un
+    sistema óptico; izquierda a derecha.
+    ENTRADAS:
+        - interfases: Lista con las diferentes matrices de cada una de las etapas del sistema en el orden en el cual ocurren
+        - distancia_Objeto == float 
+        - n_Objeto         == float, 1 por defecto
+        - n_Imagen         == float, 1 por defecto
+    RETORNA:
+        diccionario con las variables de interes, se accede con:
+        "magnificacion_Lateral"         : magnificacion lateral del sistema entero
+        "magnificacion_Angular"         : magnificacion angular del sistema entero
+        "distancia_Imagen"              : distancia a la cual se forma la imagen del sistema
+        "foco_sistema"                  : distancia focal del sistema
+        "matriz_Sistema"                : matriz de transferencia de rayos del sistema completo
+        "camino_OpticoEje"              : camino optico a lo largo del eje optico (El rayo que pasa derecho)
+    '''
+    
+    matriz_Sistema = matriz_Inicial()   #Matriz identidad para empezar a trabajar
+    camino_OpticoEje = 0                #Se crea una variable para guardar el camino optico a lo largo del eje optico del sistema
+
+    #####################################################
+    
+    for elemento in interfases:                     #Este ciclo sirve para calcular la matriz del sistema
+        camino_OpticoEje += elemento[0,1]           #Sumamos el camino optico a través del eje optico
+        matriz_Sistema = elemento @ matriz_Sistema  #Multiplicacion matricial para obtener la matriz del sistema
+
+        
+    '''Ahora, recogemos los parámetros necesarios de la matriz del sistema'''
+    
+    poder_Sistema = - matriz_Sistema[1,0]
+    foco_Sistema = 1/poder_Sistema
+    distancia_PlanoPrincipalVerticeEntrada = (n_Objeto/matriz_Sistema[1,0]) * (1-matriz_Sistema[0,0])                          # Desde el plano principal H hasta el primer vértice V  ; HV
+    distancia_PlanoPrincipalVerticeSalida = (n_Imagen/matriz_Sistema[1,0]) * (1 - matriz_Sistema[1,1])                         # Desde el plano principal H' hasta el último vértice V'; H'V'
+    distancia_ObjetoPlanoPrincipalEntrada = distancia_Objeto - distancia_PlanoPrincipalVerticeEntrada                          # Desde el objeto hasta el plano principal H            ; OH
+    distancia_PlanoPrincipalSalidaImagen = n_Imagen/(poder_Sistema-(n_Objeto/distancia_ObjetoPlanoPrincipalEntrada))           # Desde el plano H' hasta la imagen                     ; H'I
+    magnificacion_Lateral = - distancia_ObjetoPlanoPrincipalEntrada / distancia_PlanoPrincipalSalidaImagen                     # m_x
+    magnificacion_Angular = - n_Objeto/n_Imagen * distancia_PlanoPrincipalSalidaImagen/distancia_ObjetoPlanoPrincipalEntrada   # m_alfa
+    distancia_VerticeImagen = distancia_PlanoPrincipalVerticeSalida + distancia_PlanoPrincipalSalidaImagen                     # Desde el último vértice hasta la imágen               ; V'I
+
+
+    
+    '''Este diccionario contiene todas las posibles variables de interés'''
+        
+    propiedades_Sistema = {"magnificacion_Lateral": magnificacion_Lateral,
+                           "magnificacion_Angular":magnificacion_Angular,
+                           "distancia_Imagen" : distancia_VerticeImagen,
+                           "foco_Sistema": foco_Sistema,
+                           "matriz_Sistema": matriz_Sistema,
+                           "camino_EjeOptico": camino_OpticoEje}
+    return propiedades_Sistema
+
