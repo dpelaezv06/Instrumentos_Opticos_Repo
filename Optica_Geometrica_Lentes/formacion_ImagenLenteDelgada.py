@@ -58,17 +58,20 @@ def imagen_Geometrica(sistema, objeto, ventana_Objeto, resolucion, longitud_Onda
 
 longitud_Onda = 533E-9
 lado = 0.02
-resolucion = 5000
+resolucion = 3000
 ancho_Ventana = 0.2
 xx_Entrada, yy_Entrada = opt.malla_Puntos(resolucion, ancho_Ventana)
 mascara = opt.funcion_Rectangulo(lado, lado, None, xx_Entrada, yy_Entrada)
 foco_LenteAnterior = 0.1
 foco_LentePosterior = 0.15
 distancia_Adicional = 0.05
-sistema = [mat.propagacion(foco_LentePosterior), mat.lente_Delgada(foco_LentePosterior), mat.propagacion(distancia_Adicional+foco_LenteAnterior),
-           mat.lente_Delgada(foco_LenteAnterior), mat.propagacion(foco_LenteAnterior)]
+deltas = opt.producto_EspacioFrecuenciaFresnel(longitud_Onda, foco_LenteAnterior, ancho_Ventana, resolucion)
+ventana_Salida = resolucion*deltas["delta_Llegada"]
+sistema = [mat.propagacion(foco_LentePosterior), mat.lente_Delgada(foco_LentePosterior), mat.propagacion(distancia_Adicional), mat.propagacion(foco_LenteAnterior), mat.propagacion(foco_LenteAnterior)]
 propiedad_Sistema = mat.sistema_Optico(sistema, foco_LenteAnterior,1,1)
+print(propiedad_Sistema["matriz_Sistema"])
 
 campo_Salida = imagen_Geometrica(propiedad_Sistema, mascara, ancho_Ventana, resolucion, longitud_Onda)
-graph.intensidad(campo_Salida, ancho_Ventana)
+graph.intensidad(mascara, ancho_Ventana, 1, 1)
+graph.intensidad(campo_Salida, ventana_Salida, 1, 1)
 

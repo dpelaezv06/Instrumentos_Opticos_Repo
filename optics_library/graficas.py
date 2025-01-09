@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-def intensidad(campo, ventana, min=0, max=1):
+def intensidad(campo, ventana, min=1, max=1):
     ''' Grafica un patron de intensidad del campo ingresado    
     ENTRADAS:
     - campo: campo optico al que se le quiere representar su intensidad
@@ -14,7 +14,7 @@ def intensidad(campo, ventana, min=0, max=1):
     campo_Intensidad = (np.abs(campo))**2 #calculamos la intensidad del campo que se ponga en la entrada
 
     ''' GRAFICAR '''
-    plt.imshow(campo_Intensidad, extent = limites_eje, origin='lower', cmap='gray', vmin= min*np.max(campo_Intensidad) , vmax=max*np.max(campo_Intensidad)) #generamos la grafica
+    plt.imshow(campo_Intensidad, extent = limites_eje, origin='lower', cmap='gray', vmin= min*np.min(campo_Intensidad), vmax=max*np.max(campo_Intensidad)) #generamos la grafica
     plt.colorbar(label="Intensidad") #agregamos la barra de color para representar la intensidad
     plt.xlabel("X (m)") #ponemos etiquetas en los ejes
     plt.ylabel("Y (m)") #ponemos etiquetas en los ejes
