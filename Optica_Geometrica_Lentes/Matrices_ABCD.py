@@ -117,8 +117,6 @@ def foco_LenteDelgada(radio_1, radio_2, n_Incidente, n_Lente, n_Salida,):
     poder_Lente = ((n_Lente - n_Incidente)/infinity(radio_1)) + ((n_Salida - n_Lente)/infinity(radio_2)) #se calcula el poder de covergencia de la lente usando la ecuacion del fabricante de lentes
     distancia_Focal = 1/poder_Lente #calculamos la distancia focal usando el poder de la lente
     return distancia_Focal #retornamos la distancia focal
-    
-
 
 
 '''Matriz de una lente delgada'''
@@ -132,8 +130,7 @@ def lente_Delgada(distancia_Focal, tamaño_Fisico = None):
         n_Lente     == float, por default es 1.5 (vidrio)
         n_Salida    == float, por default es 1 (aire)
     RETORNA:
-        Matriz ABCD correspondiente
-    '''
+        Matriz ABCD correspondiente '''
     
     matriz = matriz_Inicial()               #Se crea matriz identidad para empezar a trabajar
     poder_Lente = 1/distancia_Focal         #Se calcula el poder de la lente usando la distancia focal
@@ -162,7 +159,7 @@ def sistema_Optico(interfases, distancia_Objeto, n_Objeto, n_Imagen):
         "distancia_Imagen"              : distancia a la cual se forma la imagen del sistema
         "foco_sistema"                  : distancia focal del sistema
         "matriz_Sistema"                : matriz de transferencia de rayos del sistema completo
-        "camino_OpticoEje"              : camino optico a lo largo del eje optico (El rayo que pasa derecho)
+        "camino_EjeOptico"              : camino optico a lo largo del eje optico (El rayo que pasa derecho)
     '''
     
     matriz_Sistema = matriz_Inicial()   #Matriz identidad para empezar a trabajar
@@ -172,8 +169,7 @@ def sistema_Optico(interfases, distancia_Objeto, n_Objeto, n_Imagen):
     
     for elemento in interfases:                     #Este ciclo sirve para calcular la matriz del sistema
         camino_OpticoEje += elemento[0,1]           #Sumamos el camino optico a través del eje optico
-        matriz_Sistema = elemento @ matriz_Sistema  #Multiplicacion matricial para obtener la matriz del sistema
-
+        matriz_Sistema = matriz_Sistema @ elemento  #Multiplicacion matricial para obtener la matriz del sistema        
         
     '''Ahora, recogemos los parámetros necesarios de la matriz del sistema'''
     

@@ -1,6 +1,7 @@
 import numpy as np
 import optics_library.mascaras as opt
 import optics_library.graficas as graph
+import Matrices_ABCD as mat
 
 def formacion_Imagen(mascara, ventana, foco, distancia_MascaraLente, distancia_LenteSensor,longitud_onda = 632.8E-9):
     '''
@@ -31,7 +32,7 @@ def formacion_Imagen(mascara, ventana, foco, distancia_MascaraLente, distancia_L
     return imagen_shifteada
 
 def imagen_Geometrica(sistema, objeto, ventana_Objeto, resolucion, longitud_Onda):
-    '''funcion que saca una prediccion de la imagen geometrica de un campo optico al pasar por un sistema
+    ''' Funcion que saca una prediccion de la imagen geometrica de un campo optico al pasar por un sistema
     ENTRADAS:
     - sistema: diccionario con las propiedades del sistema, proviene de la salida de la funcion "sistema_Optico" definida en el archivo matrices ABCD
     - objeto: campo optico a la entrada del sistema
@@ -55,4 +56,19 @@ def imagen_Geometrica(sistema, objeto, ventana_Objeto, resolucion, longitud_Onda
     return campo_Salida #retornamos el campo a la salida del sistema
 
 
-    
+longitud_Onda = 533E-9
+lado = 0.02
+resolucion = 5000
+ancho_Ventana = 0.2
+xx_Entrada, yy_Entrada = opt.malla_Puntos(resolucion, ancho_Ventana)
+mascara = opt.funcion_Rectangulo(lado, lado, None, xx_Entrada, yy_Entrada)
+foco_LenteAnterior = 0.1
+foco_LentePosterior = 0.15
+distancia_Adicional = 0.05
+sistema = [mat.propagacion(foco_LentePosterior), mat.lente_Delgada(foco_LentePosterior), mat.propagacion(distancia_Adicional+foco_LenteAnterior),
+           mat.lente_Delgada(foco_LenteAnterior), mat.propagacion(foco_LenteAnterior)]
+propiedad_Sistema = mat.sistema_Optico(sistema, foco_LenteAnterior,1,1)
+
+campo_Salida = imagen_Geometrica(propiedad_Sistema, mascara, ancho_Ventana, resolucion, longitud_Onda)
+graph.intensidad(campo_Salida, ancho_Ventana)
+
