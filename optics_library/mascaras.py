@@ -90,6 +90,18 @@ def producto_EspacioFrecuencia (intervalo, resolucion): #funcion que saca los in
     deltas = {"Delta_X": deltax, "Delta_F": deltaf} #agregamos los deltas a una lista
     return deltas #retornamos el diccionario con los deltas
 
+def producto_EspacioFrecuenciaFresnel (longitud_Onda, distancia_Propagacion, intervalo, resolucion): #Calculo del producto espacio frecuencia en transformada de fresnel
+    ''' Hay que hacer una modificacion al producto espacio frecuencia cuando se usa transformada de fresnel, debido a que por este metodo hay que adaptar 
+        el kernel de fresnel, de modo que se parezca a un kernel de fourier y poder usar DFT's, de hecho, al usar una sola transforrmada de fourier, 
+        este producto solo involucra distancias del plano de salida y de llegada, por lo tanto seria un producto espacio-espacio '''
+    
+    delta_Salida = intervalo / resolucion #calculamos el delta espacio del plano de salida
+    delta_Llegada = (longitud_Onda * distancia_Propagacion) / (resolucion * delta_Salida) #calculamos el delta espacio del plano de llegada
+
+    deltas = {"delta_Salida": delta_Salida, "delta_Llegada": delta_Llegada} #ponemos ambos deltas en un diccionario
+    return deltas #retornamos el diccionario con los deltas
+
+
 #Función para seleccionar una imagen desde el PC y convertirla en un array normalizado de escala de grises
 def seleccionar_imagen(): 
     root = tk.Tk()                  # Crea una ventana oculta para el diálogo de archivo

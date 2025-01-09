@@ -4,16 +4,7 @@ import optics_library.mascaras as opt
 import time
 
 ''' FUNCIONES PROPIAS DEL PROGRAMA'''
-def producto_EspacioFrecuenciaFresnel (longitud_Onda, distancia_Propagacion, intervalo, resolucion): #Calculo del producto espacio frecuencia en transformada de fresnel
-    ''' Hay que hacer una modificacion al producto espacio frecuencia cuando se usa transformada de fresnel, debido a que por este metodo hay que adaptar 
-        el kernel de fresnel, de modo que se parezca a un kernel de fourier y poder usar DFT's, de hecho, al usar una sola transforrmada de fourier, 
-        este producto solo involucra distancias del plano de salida y de llegada, por lo tanto seria un producto espacio-espacio '''
-    
-    delta_Salida = intervalo / resolucion #calculamos el delta espacio del plano de salida
-    delta_Llegada = (longitud_Onda * distancia_Propagacion) / (resolucion * delta_Salida) #calculamos el delta espacio del plano de llegada
 
-    deltas = {"delta_Salida": delta_Salida, "delta_Llegada": delta_Llegada} #ponemos ambos deltas en un diccionario
-    return deltas #retornamos el diccionario con los deltas
 
 def transformada_Fresnel(mascara, ventana, distancia_Propagacion, longitud_Onda):
     ''' Funcion para calcular el campo optico difractado a traves de una mascara usando transformada de fresnel
@@ -35,7 +26,7 @@ def transformada_Fresnel(mascara, ventana, distancia_Propagacion, longitud_Onda)
     fase_Constante = ((np.exp(1j * numero_Onda * distancia_Propagacion)) / (1j * longitud_Onda * distancia_Propagacion)) #calculo de la fase constante para multiplicar la FFT y obtener el campo de salida
     
     ''' calculo de las coordenadas del plano de salida usando el producto espacio frecuencia modificado para la transformada de fresnel '''
-    deltas_Espacio = producto_EspacioFrecuenciaFresnel(longitud_Onda, distancia_Propagacion, ventana, resolucion) #calculamos los deltas del producto espacio frecuencia del 
+    deltas_Espacio = opt.producto_EspacioFrecuenciaFresnel(longitud_Onda, distancia_Propagacion, ventana, resolucion) #calculamos los deltas del producto espacio frecuencia del 
     longitud_VentanaSalida = resolucion * deltas_Espacio["delta_Llegada"] #la longitud del arreglo de la ventana de salida o el muestreo en el detector calculado usando el producto espacio frecuencia propio de la transformada de fresnel
     xx_Salida, yy_Salida = opt.malla_Puntos(resolucion, longitud_VentanaSalida) #malla de puntos del muestreo del plano de salida (el detector)
     
