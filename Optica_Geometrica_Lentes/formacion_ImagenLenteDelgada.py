@@ -30,3 +30,29 @@ def formacion_Imagen(mascara, ventana, foco, distancia_MascaraLente, distancia_L
     imagen_shifteada = np.fft.fftshift(imagen_Formada)
     return imagen_shifteada
 
+def imagen_Geometrica(sistema, objeto, ventana_Objeto, resolucion, longitud_Onda):
+    '''funcion que saca una prediccion de la imagen geometrica de un campo optico al pasar por un sistema
+    ENTRADAS:
+    - sistema: diccionario con las propiedades del sistema, proviene de la salida de la funcion "sistema_Optico" definida en el archivo matrices ABCD
+    - objeto: campo optico a la entrada del sistema
+    - ventana_Objeto: ancho de la ventana en el plano objeto
+    - resolucion: Cantidad de muestras que se toma del objeto
+    - longitud_Onda: Longitud de onda de la iluminacion
+    
+    RETORNA:
+    Campo optico a la salida del sistema '''
+
+    numero_Onda = (2*np.pi)/longitud_Onda #calculamos el numero de onda usando la longitud de onda
+    malla_EntradaXX, malla_EntradaYY = opt.malla_Puntos(resolucion, ventana_Objeto) #Malla de puntos relativa al muestreo del objeto a la entrada del sistema
+    deltas = opt.producto_EspacioFrecuenciaFresnel(longitud_Onda, sistema["matriz_Sistema"][0,1], ventana_Objeto, resolucion) #Aplicacion del producto espacio-frecuencia para obtener informacion de los anchos de las ventanas
+    longitud_VentanaSalida = resolucion * deltas["delta_Llegada"] #calculamos la longitud de la ventana a la salida usando la resolucion y el producto espacio-frecuencia
+    malla_SalidaXX, malla_SalidaYY = opt.malla_Puntos(resolucion, longitud_VentanaSalida) #malla de puntos correspondiente a las coordenadas del plano de salida del sistema
+    fase_Constante = np.exp(1j*numero_Onda*sistema["camino_EjeOptico"]) #el termino de fase constante, relativo a la longitud de camino optico que recorre el rayo que pasa por el centro del sistema
+    fase_ParabolicaEntrada = np.exp((1j*numero_Onda*sistema["matriz_Sistema"][1,1]*(malla_SalidaXX**2 + malla_SalidaYY**2))/(2*sistema["matriz_Sistema"][0,1])) #fase parabolica que se debe aplicar relativa a las coordenadas del sistema en la salida
+    fase_ParabolicaSalida = np.exp((1j*numero_Onda*sistema["matriz_Sistema"][0,0]*(malla_EntradaXX**2 + malla_EntradaYY**2))/(2*sistema["matriz_Sistema"][0,1])) #fase parabolica que se debe aplicar relativa a las coordenadas del sistema en la entrada
+    transformada_Fresnel = np.fft.fftshift(np.fft.fft2(objeto*fase_ParabolicaEntrada)) #calculamos la transformada de fourier modificada, de la transformada de fresnel
+    campo_Salida = fase_Constante*fase_ParabolicaSalida*transformada_Fresnel #calculamos el campo de salida multiplicando por las fases parabolicas y la transformada de fresnel 
+    return campo_Salida #retornamos el campo a la salida del sistema
+
+
+    
