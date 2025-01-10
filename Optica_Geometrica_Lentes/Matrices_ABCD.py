@@ -169,7 +169,7 @@ def sistema_Optico(interfases, distancia_Objeto, n_Objeto, n_Imagen):
     
     for elemento in interfases:                     #Este ciclo sirve para calcular la matriz del sistema
         camino_OpticoEje += elemento[0,1]           #Sumamos el camino optico a través del eje optico
-        matriz_Sistema = matriz_Sistema @ elemento  #Multiplicacion matricial para obtener la matriz del sistema        
+        matriz_Sistema = matriz_Sistema @ elemento  #Multiplicacion matricial para obtener la matriz del sistema
         
     '''Ahora, recogemos los parámetros necesarios de la matriz del sistema'''
     
