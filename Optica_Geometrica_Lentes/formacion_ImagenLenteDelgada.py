@@ -51,8 +51,46 @@ def imagen_Geometrica(sistema, objeto, ventana_Objeto, resolucion, longitud_Onda
     fase_Constante = np.exp(1j*numero_Onda*sistema["camino_EjeOptico"]) #el termino de fase constante, relativo a la longitud de camino optico que recorre el rayo que pasa por el centro del sistema
     fase_ParabolicaEntrada = np.exp((1j*numero_Onda*sistema["matriz_Sistema"][0,0]*(malla_EntradaXX**2 + malla_EntradaYY**2))/(2*sistema["matriz_Sistema"][0,1])) #fase parabolica que se debe aplicar relativa a las coordenadas del sistema en la salida
     fase_ParabolicaSalida = np.exp((1j*numero_Onda*sistema["matriz_Sistema"][1,1]*(malla_SalidaXX**2 + malla_SalidaYY**2))/(2*sistema["matriz_Sistema"][0,1])) #fase parabolica que se debe aplicar relativa a las coordenadas del sistema en la entrada
-    transformada_Fresnel = np.fft.fftshift(np.fft.fft2(objeto*fase_ParabolicaEntrada)) #calculamos la transformada de fourier modificada, de la transformada de fresnel
+    transformada_Fresnel = (np.fft.fft2(objeto*fase_ParabolicaEntrada)) #calculamos la transformada de fourier modificada, de la transformada de fresnel
     campo_Salida = ((deltas["delta_Llegada"])**2)*fase_Constante*fase_ParabolicaSalida*transformada_Fresnel #calculamos el campo de salida multiplicando por las fases parabolicas y la transformada de fresnel 
     return campo_Salida #retornamos el campo a la salida del sistema
+
+
+longitud_Onda = 533E-9
+lado = 0.05
+resolucion = 7423
+ancho_Ventana = 2
+xx_Entrada, yy_Entrada = opt.malla_Puntos(resolucion, ancho_Ventana)
+mascara = opt.funcion_Rectangulo(lado, lado, None, xx_Entrada, yy_Entrada)
+
+foco_LenteAnterior = 0.07
+foco_LentePosterior = 0.2
+distancia_Adicional = 0.09
+distancia_Objeto = 0.3
+
+
+'''
+sistema = [mat.propagacion(foco_LentePosterior), mat.lente_Delgada(foco_LentePosterior), mat.propagacion(distancia_Adicional), mat.propagacion(foco_LenteAnterior), mat.lente_Delgada(foco_LenteAnterior), mat.propagacion(foco_LenteAnterior)]
+propiedad_Sistema = mat.sistema_Optico(sistema, foco_LenteAnterior,1,1)
+'''
+sistema_Anterior = [mat.propagacion(distancia_Objeto)]
+propiedad_SistemaAnterior = mat.sistema_Optico(sistema_Anterior, distancia_Adicional, 1, 1)
+deltas_Anterior = opt.producto_EspacioFrecuenciaFresnel(longitud_Onda, propiedad_SistemaAnterior["matriz_Sistema"][0,1], ancho_Ventana, resolucion)
+ventana_SalidaDiafragma = resolucion*deltas_Anterior["delta_Llegada"]
+campo_Anterior = imagen_Geometrica(propiedad_SistemaAnterior, mascara, ancho_Ventana, resolucion, longitud_Onda)
+
+xx_Diafragma, yy_Diafragma = opt.malla_Puntos(resolucion, ventana_SalidaDiafragma)
+diafragma_Campo = opt.funcion_Circulo(0.3, None, xx_Diafragma, yy_Diafragma)
+campo_AnteriorDiafragma = diafragma_Campo * campo_Anterior
+
+sistema_Posterior = [mat.propagacion(distancia_Adicional), mat.lente_Delgada(foco_LenteAnterior)]
+propiedad_SistemaPosterior = mat.sistema_Optico(sistema_Posterior, distancia_Adicional, 1, 1)
+deltas_Posterior = opt.producto_EspacioFrecuenciaFresnel(longitud_Onda, propiedad_SistemaPosterior["matriz_Sistema"][0,1], ventana_SalidaDiafragma, resolucion)
+ventana_Salida = resolucion*deltas_Posterior["delta_Llegada"]
+campo_Salida = imagen_Geometrica(propiedad_SistemaPosterior, campo_AnteriorDiafragma, ventana_SalidaDiafragma, resolucion, longitud_Onda)
+
+
+graph.intensidad(mascara, ancho_Ventana, 1, 1)
+graph.intensidad(campo_Salida, ventana_Salida)
 
 
