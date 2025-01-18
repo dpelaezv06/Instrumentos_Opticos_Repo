@@ -120,15 +120,12 @@ def foco_LenteDelgada(radio_1, radio_2, n_Incidente, n_Lente, n_Salida,):
 
 
 '''Matriz de una lente delgada'''
-def lente_Delgada(distancia_Focal, tamaño_Fisico = None):
+def lente_Delgada(distancia_Focal, diametro = np.inf ):
     '''
     Función para calcular la matriz ABCD de un lente delgado
     ENTRADAS:
-        radio_1     == float si finito, str si infinito
-        radio_2     == float si finito, str si infinito
-        n_Incidente == float, por default es 1 (aire)
-        n_Lente     == float, por default es 1.5 (vidrio)
-        n_Salida    == float, por default es 1 (aire)
+        distancia_Focal == float
+        tamano_Fisico == float
     RETORNA:
         Matriz ABCD correspondiente '''
     
@@ -139,9 +136,10 @@ def lente_Delgada(distancia_Focal, tamaño_Fisico = None):
     |1                0  | Poder_lente = 1/f
     |Poder_lente      1  |
     '''
-    return matriz #retornamos la matriz
+    diccionario = {"matriz":matriz,"diametro":diametro}
+    return diccionario #retornamos la matriz
 
-def sistema_Optico(interfases, distancia_Objeto, n_Objeto, n_Imagen):
+def sistema_Optico(interfases, distancia_Objeto, ventana, n_Objeto = 1, n_Imagen = 1):
     '''
     Esta función se debe modificar para el sistema óptico que requiera implementar, esto con el fin de evitar la necesidad
     de digitar todo el tiempo lo que se requiera.
@@ -168,9 +166,13 @@ def sistema_Optico(interfases, distancia_Objeto, n_Objeto, n_Imagen):
     #####################################################
     
     for elemento in interfases:                     #Este ciclo sirve para calcular la matriz del sistema
-        camino_OpticoEje += elemento[0,1]           #Sumamos el camino optico a través del eje optico
-        matriz_Sistema = matriz_Sistema @ elemento  #Multiplicacion matricial para obtener la matriz del sistema
-        
+        if type(elemento) == dict:    
+            camino_OpticoEje += elemento["matriz"][0,1]          #Sumamos el camino optico a través del eje optico
+            matriz_Sistema = matriz_Sistema @ elemento["matriz"] #Multiplicacion matricial para obtener la matriz del sistema
+        else:
+            camino_OpticoEje += elemento[0,1]           #Sumamos el camino optico a través del eje optico
+            matriz_Sistema = matriz_Sistema @ elemento  #Multiplicacion matricial para obtener la matriz del sistema
+            
     '''Ahora, recogemos los parámetros necesarios de la matriz del sistema'''
     
     poder_Sistema = - matriz_Sistema[1,0]
@@ -194,4 +196,3 @@ def sistema_Optico(interfases, distancia_Objeto, n_Objeto, n_Imagen):
                            "matriz_Sistema": matriz_Sistema,
                            "camino_EjeOptico": camino_OpticoEje}
     return propiedades_Sistema
-
