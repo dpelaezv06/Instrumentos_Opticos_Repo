@@ -135,24 +135,56 @@ def diafragma_ParLentes(lente_Anterior, lente_Posterior, distancia_Lentes, vecto
     return 0
 
 
-longitud_Onda = 533E-9
-lado = 0.05
-resolucion = 3000
-ancho_Ventana = 4
-xx_Entrada, yy_Entrada = opt.malla_Puntos(resolucion, ancho_Ventana)
-mascara = opt.funcion_Rectangulo(lado, lado, None, xx_Entrada, yy_Entrada)
 
+''' definicion de parametros del montaje experimental'''
+#caracteristicas del montaje y la ilimunacion
+longitud_Onda = 533E-9
 foco_LenteAnterior = 0.07
 foco_LentePosterior = 0.05
 distancia_Adicional = 0.01
 distancia_Objeto = 0.3
+diametro_Diafragma = 14E-6
+
+#calculo de las caracteristicas de cada sistema
+sistema_Anterior = [mat.propagacion(foco_LenteAnterior), mat.lente_Delgada(foco_LenteAnterior), mat.propagacion(foco_LenteAnterior)]
+sistema_Posterior = [mat.propagacion(foco_LentePosterior), mat.lente_Delgada(foco_LentePosterior), mat.propagacion(distancia_Adicional)]
+
+#caracteristicas del sensor y parametros de muestreo... Pueden depender del sensor
+pixeles_X = 2448
+pixeles_Y = 2048
+tamano_Pixel = 3.45E-6
+longitud_SensorX = pixeles_X * tamano_Pixel
+longitud_SensorY = pixeles_Y * tamano_Pixel
+
+#calculo de ventana en el espacio de muestreo del diafragma
+muestreo_Diafragma = opt.muestreo_SegunSensorFresnel(pixeles_X, longitud_SensorX, sistema_Posterior["matriz_Sistema"][0,1], longitud_Onda, pixeles_Y, longitud_SensorY)
+ancho_XVentanaDiafragma = muestreo_Diafragma["delta_XEntrada"] * pixeles_X
+ancho_YVentanaDiafragma = muestreo_Diafragma["delta_YEntrada"] * pixeles_Y
+malla_XDiafragma, malla_YDiafragma = opt.malla_Puntos(pixeles_X, ancho_XVentanaDiafragma, pixeles_Y, ancho_YVentanaDiafragma)
+
+
+
+
+resolucion = 3000
+ancho_Ventana = 4
+xx_Entrada, yy_Entrada = opt.malla_Puntos(resolucion, ancho_Ventana)
+
+
+''' creacion del objeto '''
+lado = 0.05
+mascara = opt.funcion_Rectangulo(lado, lado, None, xx_Entrada, yy_Entrada)
+
+
+
+
+
 
 
 '''
 sistema = [mat.propagacion(foco_LentePosterior), mat.lente_Delgada(foco_LentePosterior), mat.propagacion(distancia_Adicional), mat.propagacion(foco_LenteAnterior), mat.lente_Delgada(foco_LenteAnterior), mat.propagacion(foco_LenteAnterior)]
 propiedad_Sistema = mat.sistema_Optico(sistema, foco_LenteAnterior,1,1)
 '''
-sistema_Anterior = [mat.propagacion(foco_LenteAnterior), mat.lente_Delgada(foco_LenteAnterior), mat.propagacion(foco_LenteAnterior)]
+
 propiedad_SistemaAnterior = mat.sistema_Optico(sistema_Anterior, foco_LenteAnterior, ancho_Ventana)
 deltas_Anterior = opt.producto_EspacioFrecuenciaFresnel(longitud_Onda, propiedad_SistemaAnterior["matriz_Sistema"][0,1], ancho_Ventana, resolucion)
 ventana_SalidaDiafragma = resolucion*deltas_Anterior["delta_Llegada"]
@@ -160,10 +192,10 @@ campo_Anterior = imagen_Sistema(propiedad_SistemaAnterior, mascara, ancho_Ventan
 #graph.intensidad(campo_Anterior, ventana_SalidaDiafragma)
 
 xx_Diafragma, yy_Diafragma = opt.malla_Puntos(resolucion, ventana_SalidaDiafragma)
-diafragma_Campo = opt.funcion_Circulo(1, None, xx_Diafragma, yy_Diafragma)
+diafragma_Campo = opt.funcion_Circulo(diametro_Diafragma/2, None, xx_Diafragma, yy_Diafragma)
 campo_AnteriorDiafragma = diafragma_Campo * campo_Anterior
 
-sistema_Posterior = [mat.propagacion(foco_LentePosterior), mat.lente_Delgada(foco_LentePosterior), mat.propagacion(distancia_Adicional)]
+
 propiedad_SistemaPosterior = mat.sistema_Optico(sistema_Posterior, distancia_Adicional, ventana_SalidaDiafragma)
 deltas_Posterior = opt.producto_EspacioFrecuenciaFresnel(longitud_Onda, propiedad_SistemaPosterior["matriz_Sistema"][0,1], ventana_SalidaDiafragma, resolucion)
 ventana_Salida = resolucion*deltas_Posterior["delta_Llegada"]
@@ -172,7 +204,7 @@ campo_Salida = imagen_SistemaShift(propiedad_SistemaPosterior, campo_AnteriorDia
 
 
 graph.intensidad(mascara, ancho_Ventana, 1, 1)
-graph.intensidad(campo_Anterior,ventana_Salida,1, 0.01)
+graph.intensidad(campo_Anterior,ventana_SalidaDiafragma,1, 0.01)
 graph.intensidad(campo_AnteriorDiafragma, ventana_SalidaDiafragma, 1, 0.01)
 graph.intensidad(campo_Salida, ventana_Salida, 1, 0.001)
 
