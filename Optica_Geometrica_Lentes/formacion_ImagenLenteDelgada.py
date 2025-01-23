@@ -77,7 +77,7 @@ def formacion_Imagen(mascara, ventana, foco, distancia_MascaraLente, distancia_L
     imagen_shifteada = np.fft.fftshift(imagen_Formada)
     return imagen_shifteada
 
-def imagen_Geometrica(sistema, objeto, ventana_Objeto, resolucion, longitud_Onda = 632.8E-9):
+def imagen_Sistema(sistema, objeto, ventana_Objeto, resolucion, longitud_Onda = 632.8E-9):
     ''' Funcion que saca una prediccion de la imagen geometrica de un campo optico al pasar por un sistema
     ENTRADAS:
     - sistema: diccionario con las propiedades del sistema, proviene de la salida de la funcion "sistema_Optico" definida en el archivo matrices ABCD
@@ -100,7 +100,7 @@ def imagen_Geometrica(sistema, objeto, ventana_Objeto, resolucion, longitud_Onda
     campo_Salida = ((deltas["delta_Llegada"])**2)*fase_Constante*fase_ParabolicaSalida*transformada_Fresnel #calculamos el campo de salida multiplicando por las fases parabolicas y la transformada de fresnel 
     return campo_Salida #retornamos el campo a la salida del sistema
 
-def imagen_GeometricaShift(sistema, objeto, ventana_Objeto, resolucion, longitud_Onda = 632.8E-9):
+def imagen_SistemaShift(sistema, objeto, ventana_Objeto, resolucion, longitud_Onda = 632.8E-9):
     ''' Funcion que saca una prediccion de la imagen geometrica de un campo optico al pasar por un sistema
     ENTRADAS:
     - sistema: diccionario con las propiedades del sistema, proviene de la salida de la funcion "sistema_Optico" definida en el archivo matrices ABCD
@@ -156,7 +156,7 @@ sistema_Anterior = [mat.propagacion(foco_LenteAnterior), mat.lente_Delgada(foco_
 propiedad_SistemaAnterior = mat.sistema_Optico(sistema_Anterior, foco_LenteAnterior, ancho_Ventana)
 deltas_Anterior = opt.producto_EspacioFrecuenciaFresnel(longitud_Onda, propiedad_SistemaAnterior["matriz_Sistema"][0,1], ancho_Ventana, resolucion)
 ventana_SalidaDiafragma = resolucion*deltas_Anterior["delta_Llegada"]
-campo_Anterior = imagen_Geometrica(propiedad_SistemaAnterior, mascara, ancho_Ventana, resolucion, longitud_Onda)
+campo_Anterior = imagen_Sistema(propiedad_SistemaAnterior, mascara, ancho_Ventana, resolucion, longitud_Onda)
 #graph.intensidad(campo_Anterior, ventana_SalidaDiafragma)
 
 xx_Diafragma, yy_Diafragma = opt.malla_Puntos(resolucion, ventana_SalidaDiafragma)
@@ -167,7 +167,7 @@ sistema_Posterior = [mat.propagacion(foco_LentePosterior), mat.lente_Delgada(foc
 propiedad_SistemaPosterior = mat.sistema_Optico(sistema_Posterior, distancia_Adicional, ventana_SalidaDiafragma)
 deltas_Posterior = opt.producto_EspacioFrecuenciaFresnel(longitud_Onda, propiedad_SistemaPosterior["matriz_Sistema"][0,1], ventana_SalidaDiafragma, resolucion)
 ventana_Salida = resolucion*deltas_Posterior["delta_Llegada"]
-campo_Salida = imagen_GeometricaShift(propiedad_SistemaPosterior, campo_AnteriorDiafragma, ventana_SalidaDiafragma, resolucion, longitud_Onda)
+campo_Salida = imagen_SistemaShift(propiedad_SistemaPosterior, campo_AnteriorDiafragma, ventana_SalidaDiafragma, resolucion, longitud_Onda)
 
 
 
