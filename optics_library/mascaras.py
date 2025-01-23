@@ -7,18 +7,65 @@ import random
 
 '''Funciones para creación de máscaras'''
 
-def malla_Puntos(resolucion, longitud_Arreglo): #funcion que crea mallas de puntos 
+def malla_Puntos(puntos_Ancho, ancho_Arreglo, puntos_Alto = None, alto_Arreglo=None):
     ''' Crea mallas de puntos
     ENTRADAS:
-        resolucion == cantidad de puntos del arreglo
-        longitud_Arreglo == longitud física del arreglo
+        puntos_Ancho -> cantidad de puntos en el ancho
+        puntos_Alto -> cantidad de puntos en el alto
+        ancho_Arreglo -> longitud física del ancho
+        alto_Arreglo -> longitud física del alto (opcional, por defecto igual a ancho_Arreglo)
     RETORNA:
-        xx, yy -> malla de puntos cuadrada'''
+        xx, yy -> malla de puntos bidimensional'''
     
-    x = np.linspace(-longitud_Arreglo / 2, longitud_Arreglo / 2, resolucion) #crea las mallas de puntos para el arreglo 
-    y = np.linspace(-longitud_Arreglo / 2, longitud_Arreglo / 2, resolucion) 
+
+    ''' Definicion de valores por default para ancho y alto, si no se especifican entonces le muestreo es cuadrado y uniforme '''
+    if alto_Arreglo is None:
+        alto_Arreglo = ancho_Arreglo
+
+    if puntos_Alto is None:
+        puntos_Alto = puntos_Ancho
+    
+    x = np.linspace(-ancho_Arreglo / 2, ancho_Arreglo / 2, puntos_Ancho) #crea las mallas de puntos para el arreglo 
+    y = np.linspace(-alto_Arreglo / 2, alto_Arreglo / 2, puntos_Alto) 
     xx, yy = np.meshgrid(x, y) #crea una malla de puntos bidimensional 
     return xx, yy #retornamos la malla de puntos
+
+def muestreo_SegunSensorFresnel(puntos_AnchoSensor, ancho_Sensor, distancia_Propagacion, longitud_Onda, puntos_AltoSensor = None, alto_Sensor=None):
+
+    ''' Crea mallas de puntos
+    ENTRADAS:
+    puntos_Ancho -> cantidad de puntos en el ancho
+    puntos_Alto -> cantidad de puntos en el alto
+    ancho_Arreglo -> longitud física del ancho
+    alto_Arreglo -> longitud física del alto (opcional, por defecto igual a ancho_Arreglo)
+
+    RETORNA:
+    Un diccionario con el muestreo en x y y (horizontal y vertical) que se debe hacer al campo de entrada considerando las caracteristicas fisicas de
+    un sensor particular usado
+
+    "delta_XEntrada" -> distancia entre puntos del muestreo horizontal del campo de entrada
+    "delta_YEntrada" -> distancia entre puntos del muestreo vertical del campo de entrada
+
+    '''
+
+
+    ''' Definicion de parametros default, el caso deafult comprende un sensor cuadrado de muestreo uniforme en x y y '''
+    if alto_Sensor is None: #definicion del alto por default
+        alto_Sensor = ancho_Sensor #en caso default el ancho y el alto son iguales
+
+    if puntos_AltoSensor is None: # definicion del muestreo vertical por defualt
+        puntos_AltoSensor = puntos_AnchoSensor #el caso default es un muestreo uniforme
+        
+
+    delta_XSensor = ancho_Sensor / puntos_AnchoSensor #calculamos el espaciamiento horizontal entre los puntos del sensor
+    delta_YSensor = alto_Sensor / puntos_AltoSensor #calculamos el espaciamiento vertical entre los puntos del sensor
+
+    delta_EntradaX = (longitud_Onda * distancia_Propagacion) / (puntos_AnchoSensor * delta_XSensor) #calculamos el espaciamiento horizontal en la entrada teniendo en cuenta el producto espacio-frecuencia de fresnel
+    delta_EntradaY = (longitud_Onda * distancia_Propagacion) / (puntos_AltoSensor * delta_YSensor) #calculamos el espaciamiento horizontal en la entrada teniendo en cuenta el producto espacio-frecuencia de fresnel
+
+    muestreo_Entrada = {"delta_XEntrada" : delta_EntradaX, "delta_YEntrada" : delta_EntradaY} # creamos un diccionario para retornar el muestreo de la fuente en x y y segun el sensor usado 
+
+    return muestreo_Entrada #retornamos el diccionario que contiene los parametros de muestreo en el campo de entrada teniendo en cuenta el muestreo del sensor
 
 def funcion_punto_3(m, L, xx): # Función que retorna un array con la transmitancia de la función 1/2 + m/2 cos(2*pi*x/L). La del punto 3
     '''

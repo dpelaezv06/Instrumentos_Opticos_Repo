@@ -31,12 +31,12 @@ def transformada_Fresnel(mascara, ventana, distancia_Propagacion, longitud_Onda)
     xx_Salida, yy_Salida = opt.malla_Puntos(resolucion, longitud_VentanaSalida) #malla de puntos del muestreo del plano de salida (el detector)
     
     ''' termino de la fase parabolica en el plano de salida '''
-    fase_ParabolicaSalida = np.exp((1j * (numero_Onda / 2 * distancia_Propagacion) * ((xx_Salida ** 2) + (yy_Salida ** 2)))) #calculo de la fase parabolica en el plano de salida usando las coordenadas calculados en el plano de salida
+    fase_ParabolicaSalida = np.exp((1j * (numero_Onda / (2 * distancia_Propagacion)) * ((xx_Salida ** 2) + (yy_Salida ** 2)))) #calculo de la fase parabolica en el plano de salida usando las coordenadas calculados en el plano de salida
     
     ''' operaciones para obtener el campo de salida '''
     campo_EntradaParabolico = mascara * fase_ParabolicaEntrada #preparamos el campo de entrada para meterlo a la fft
     campo_SalidaSinEscalar = np.fft.fft2(campo_EntradaParabolico) #calculamos la fft del campo de entrada multiplicado por la fase parabolica
-    campo_Salida = np.fft.fftshift(campo_SalidaSinEscalar) * (deltas_Espacio["delta_Salida"] ** 2) * fase_Constante * fase_ParabolicaSalida #escalamos el campo de salida con las constantes
+    campo_Salida = np.fft.fftshift(campo_SalidaSinEscalar) * (deltas_Espacio["delta_Llegada"] ** 2) * fase_Constante * fase_ParabolicaSalida #escalamos el campo de salida con las constantes
 
     return campo_Salida #retorna la distribucion de campo optico a la salida
 
