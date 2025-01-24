@@ -261,9 +261,13 @@ def rejilla_AperturasCuadradas(no_rectangulos_por_mm, ventana, xx, yy):
             mascara += rectangulo_mascara
     return mascara
 
+import cv2
+import numpy as np
+from typing import Tuple
+
 def resize_with_pad(image: np.array, 
                     new_shape: Tuple[int, int], 
-                    padding_color: Tuple[int] = (255, 255, 255)) -> np.array:
+                    padding_color: Tuple[int] = (0, 0, 0)) -> np.array:
     """Maintains aspect ratio and resizes with padding.
     Params:
         image: Image to be resized.
@@ -272,13 +276,22 @@ def resize_with_pad(image: np.array,
     Returns:
         image: Resized image with padding
     """
-    original_shape = (image.shape[1], image.shape[0])
-    ratio = float(max(new_shape))/max(original_shape)
-    new_size = tuple([int(x*ratio) for x in original_shape])
-    image = cv2.resize(image, new_size)
-    delta_w = new_shape[0] - new_size[0]
-    delta_h = new_shape[1] - new_size[1]
-    top, bottom = delta_h//2, delta_h-(delta_h//2)
-    left, right = delta_w//2, delta_w-(delta_w//2)
+    # Dimensiones originales de la imagen
+    original_shape = (image.shape[1], image.shape[0])  # (width, height)
+    
+    # Calcular la relación de aspecto para mantener proporciones
+    ratio = min(new_shape[0] / original_shape[0], new_shape[1] / original_shape[1])
+    new_size = tuple([int(x * ratio) for x in original_shape])  # Tamaño redimensionado (proporcional)
+    
+    # Redimensionar la imagen
+    image = cv2.resize(image, new_size, interpolation=cv2.INTER_AREA)
+    
+    # Calcular deltas (bordes necesarios)
+    delta_w = max(new_shape[0] - new_size[0], 0)
+    delta_h = max(new_shape[1] - new_size[1], 0)
+    top, bottom = delta_h // 2, delta_h - (delta_h // 2)
+    left, right = delta_w // 2, delta_w - (delta_w // 2)
+    
+    # Agregar bordes para ajustar la imagen al tamaño deseado
     image = cv2.copyMakeBorder(image, top, bottom, left, right, cv2.BORDER_CONSTANT, value=padding_color)
     return image

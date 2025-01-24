@@ -151,7 +151,7 @@ foco_LenteAnterior = 0.07
 foco_LentePosterior = 0.05
 distancia_Adicional = 0.01
 distancia_Objeto = 0.3
-diametro_Diafragma = 5E-3
+diametro_Diafragma = 180E-6
 
 #calculo de las caracteristicas de cada sistema
 sistema_Anterior = [mat.propagacion(foco_LenteAnterior), mat.lente_Delgada(foco_LenteAnterior), mat.propagacion(foco_LenteAnterior)]
@@ -181,8 +181,8 @@ malla_XObjeto, malla_YObjeto = opt.malla_Puntos(pixeles_X, ancho_XVentanaDiafrag
 
 ''' creacion del objeto '''
 lado = 250E-6
-mascara = opt.funcion_Rectangulo(lado, lado, None, malla_XObjeto, malla_YObjeto)
-
+mascara = opt.img_to_array("images/Ruido_E04.png")
+mascara = opt.resize_with_pad(mascara, [2448, 2048])
 
 
 campo_Anterior = imagen_Sistema(propiedad_SistemaAnterior, mascara, ancho_XVentanaDiafragma, pixeles_X, ancho_YVentanaDiafragma, pixeles_Y, longitud_Onda)
@@ -192,8 +192,8 @@ campo_AnteriorDiafragma = diafragma_Campo * campo_Anterior
 
 campo_Salida = imagen_SistemaShift(propiedad_SistemaPosterior, campo_AnteriorDiafragma, longitud_SensorX, pixeles_X, longitud_SensorY, pixeles_Y, longitud_Onda)
 
-graph.intensidad(mascara, ancho_XVentanaObjeto, ancho_YVentanaObjeto, 1, 1)
-graph.intensidad(campo_Anterior,ancho_XVentanaDiafragma, ancho_YVentanaDiafragma, 1, 0.01)
-graph.intensidad(campo_AnteriorDiafragma, ancho_XVentanaDiafragma, ancho_YVentanaDiafragma, 1, 0.01)
-graph.intensidad(campo_Salida, longitud_SensorX, longitud_SensorY, 1, 0.001)
+#graph.intensidad(mascara, ancho_XVentanaObjeto, ancho_YVentanaObjeto, 1, 1)
+#graph.intensidad(campo_Anterior,ancho_XVentanaDiafragma, ancho_YVentanaDiafragma, 1, 0.01)
+#graph.intensidad(campo_AnteriorDiafragma, ancho_XVentanaDiafragma, ancho_YVentanaDiafragma, 1, 0.01)
+graph.intensidad(campo_Salida, longitud_SensorX, longitud_SensorY, 1, 1)
 
