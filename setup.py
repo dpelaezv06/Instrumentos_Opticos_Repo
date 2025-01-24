@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='optics',
-    version='0.1.0',
+    version='0.1.01',
     description='Repositorio para contenidos del curso de instrumentos ópticos, incluyendo modelos de difracción y herramientas ópticas',
     author='Jose Diaz, Daniel Pelaez',
     author_email='jodiazgu@unal.edu.co; dpelaezv@unal.edu.co',
