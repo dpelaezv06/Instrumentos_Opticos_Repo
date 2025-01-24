@@ -89,13 +89,13 @@ def imagen_Sistema(sistema, objeto, ventana_PosteriorX, pixeles_X, ventana_Poste
     RETORNA:
     Campo optico a la salida del sistema '''
     numero_Onda = (2*np.pi)/longitud_Onda #calculo del numero de onda asociado a la iluminacion incidente
-    muestreo_Anterior = opt.muestreo_SegunSensorFresnel(pixeles_X, ventana_PosteriorX, sistema["matriz_Sistema"][0,1], longitud_Onda, pixeles_Y, ventana_PosteriorY)
-    ancho_XVentanaAnterior = muestreo_Anterior["delta_XEntrada"] * pixeles_X 
-    ancho_YVentanaAnterior = muestreo_Anterior["delta_YEntrada"] * pixeles_Y
-    malla_XAnterior, malla_YAnterior = opt.malla_Puntos(pixeles_X, ancho_XVentanaAnterior, pixeles_Y, ancho_YVentanaAnterior)
-    malla_XPosterior, malla_YPosterior = opt.malla_Puntos(pixeles_X, ventana_PosteriorX, pixeles_Y, ventana_PosteriorY)
-    delta_XPosterior = ventana_PosteriorX / pixeles_X 
-    delta_YPosterior = ventana_PosteriorY / pixeles_Y
+    muestreo_Anterior = opt.muestreo_SegunSensorFresnel(pixeles_X, ventana_PosteriorX, sistema["matriz_Sistema"][0,1], longitud_Onda, pixeles_Y, ventana_PosteriorY) #se calcula el muestreo de la ventana de entrada dependiendod del seensor usado
+    ancho_XVentanaAnterior = muestreo_Anterior["delta_XEntrada"] * pixeles_X # ancho de la ventana de la entrada
+    ancho_YVentanaAnterior = muestreo_Anterior["delta_YEntrada"] * pixeles_Y # alto de la ventana de la entrada
+    malla_XAnterior, malla_YAnterior = opt.malla_Puntos(pixeles_X, ancho_XVentanaAnterior, pixeles_Y, ancho_YVentanaAnterior) #malla de puntos de la entrada
+    malla_XPosterior, malla_YPosterior = opt.malla_Puntos(pixeles_X, ventana_PosteriorX, pixeles_Y, ventana_PosteriorY) #malla de puntos de la salida
+    delta_XPosterior = ventana_PosteriorX / pixeles_X  # delta de muestreo de la salida en el eje x
+    delta_YPosterior = ventana_PosteriorY / pixeles_Y # delta de muestreo de la salida en el eje y
 
     fase_Constante = np.exp(1j*numero_Onda*sistema["camino_EjeOptico"]) #el termino de fase constante, relativo a la longitud de camino optico que recorre el rayo que pasa por el centro del sistema
     fase_ParabolicaAnterior = np.exp((1j*numero_Onda*sistema["matriz_Sistema"][0,0]*(malla_XAnterior**2 + malla_YAnterior**2))/(2*sistema["matriz_Sistema"][0,1])) #fase parabolica que se debe aplicar relativa a las coordenadas del sistema en la salida
@@ -116,13 +116,13 @@ def imagen_SistemaShift(sistema, objeto, ventana_PosteriorX, pixeles_X, ventana_
     RETORNA:
     Campo optico a la salida del sistema '''
     numero_Onda = (2*np.pi)/longitud_Onda #calculo del numero de onda asociado a la iluminacion incidente
-    muestreo_Anterior = opt.muestreo_SegunSensorFresnel(pixeles_X, ventana_PosteriorX, sistema["matriz_Sistema"][0,1], longitud_Onda, pixeles_Y, ventana_PosteriorY)
-    ancho_XVentanaAnterior = muestreo_Anterior["delta_XEntrada"] * pixeles_X 
-    ancho_YVentanaAnterior = muestreo_Anterior["delta_YEntrada"] * pixeles_Y
-    malla_XAnterior, malla_YAnterior = opt.malla_Puntos(pixeles_X, ancho_XVentanaAnterior, pixeles_Y, ancho_YVentanaAnterior)
-    malla_XPosterior, malla_YPosterior = opt.malla_Puntos(pixeles_X, ventana_PosteriorX, pixeles_Y, ventana_PosteriorY)
-    delta_XPosterior = ventana_PosteriorX / pixeles_X 
-    delta_YPosterior = ventana_PosteriorY / pixeles_Y
+    muestreo_Anterior = opt.muestreo_SegunSensorFresnel(pixeles_X, ventana_PosteriorX, sistema["matriz_Sistema"][0,1], longitud_Onda, pixeles_Y, ventana_PosteriorY) # se calcula el muestreo de la ventana de entrada segun el muestreo de la salida
+    ancho_XVentanaAnterior = muestreo_Anterior["delta_XEntrada"] * pixeles_X # ancho de la ventana de muestreo en el eje x del plano anterior del sistema
+    ancho_YVentanaAnterior = muestreo_Anterior["delta_YEntrada"] * pixeles_Y # alto de la ventana de muestreo en el eje y del plano anterior del sistema
+    malla_XAnterior, malla_YAnterior = opt.malla_Puntos(pixeles_X, ancho_XVentanaAnterior, pixeles_Y, ancho_YVentanaAnterior) #malla de puntos de la entrada del sistema
+    malla_XPosterior, malla_YPosterior = opt.malla_Puntos(pixeles_X, ventana_PosteriorX, pixeles_Y, ventana_PosteriorY) #malla de puntos del plano de salida del sistema
+    delta_XPosterior = ventana_PosteriorX / pixeles_X #delta de muestreo de la ventana de salida del sistema en el eje x
+    delta_YPosterior = ventana_PosteriorY / pixeles_Y #delta de muestreo de la ventana de salida del sistema en el eje y
 
     fase_Constante = np.exp(1j*numero_Onda*sistema["camino_EjeOptico"]) #el termino de fase constante, relativo a la longitud de camino optico que recorre el rayo que pasa por el centro del sistema
     fase_ParabolicaAnterior = np.exp((1j*numero_Onda*sistema["matriz_Sistema"][0,0]*(malla_XAnterior**2 + malla_YAnterior**2))/(2*sistema["matriz_Sistema"][0,1])) #fase parabolica que se debe aplicar relativa a las coordenadas del sistema en la salida
