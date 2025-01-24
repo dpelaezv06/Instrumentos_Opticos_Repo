@@ -139,7 +139,7 @@ def lente_Delgada(distancia_Focal, diametro = np.inf ):
     diccionario = {"matriz":matriz,"diametro":diametro}
     return diccionario #retornamos la matriz
 
-def sistema_Optico(interfases, distancia_Objeto, ventana, n_Objeto = 1, n_Imagen = 1):
+def sistema_Optico(interfases, distancia_Objeto, n_Objeto = 1, n_Imagen = 1):
     '''
     Esta función se debe modificar para el sistema óptico que requiera implementar, esto con el fin de evitar la necesidad
     de digitar todo el tiempo lo que se requiera.
