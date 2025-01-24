@@ -99,6 +99,14 @@ def funcion_Circulo(radio, centro, xx, yy, opacidad = 1): #definicion de la func
     mascara = np.where(distancia <= radio**2, opacidad, 0) #los puntos de la mascara seran los puntos cuya distancia al centro es menor que el radio
     return mascara #devolvemos los puntos que cumplen la condicion para hacer parte de la mascara
 
+def funcion_GaussianaSimetrica(sigma,xx,yy,promediox=0,promedioy=0):
+    transmitancia = np.exp(-((xx-promediox)**2)/(2*sigma**2)-((yy-promedioy)**2)/(2*sigma**2))
+    return transmitancia
+
+def invertir_Array(campo):
+    campo = 1/campo
+    return campo
+
 def funcion_Rectangulo(base, altura, centro, xx, yy): #funcion para realizar una funcion rectangulo
     '''
     Crea una máscara con un rectángulo
