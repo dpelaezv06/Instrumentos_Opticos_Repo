@@ -99,13 +99,16 @@ def funcion_Circulo(radio, centro, xx, yy, opacidad = 1): #definicion de la func
     mascara = np.where(distancia <= radio**2, opacidad, 0) #los puntos de la mascara seran los puntos cuya distancia al centro es menor que el radio
     return mascara #devolvemos los puntos que cumplen la condicion para hacer parte de la mascara
 
-def funcion_GaussianaSimetrica(sigma,xx,yy,promediox=0,promedioy=0):
+def funcion_GaussianaSimetrica(sigma, xx, yy, promediox = 0, promedioy = 0):
+    ''' Funcion que representa una transmitancia gaussiana
+    ENTRADAS:
+    sigma = '''
     transmitancia = np.exp(-((xx-promediox)**2)/(2*sigma**2)-((yy-promedioy)**2)/(2*sigma**2))
     return transmitancia
 
 def invertir_Array(campo):
-    campo = 1/campo
-    return campo
+    campo_Invertido = 1 - campo
+    return campo_Invertido
 
 def funcion_Rectangulo(base, altura, centro, xx, yy): #funcion para realizar una funcion rectangulo
     '''
@@ -269,10 +272,6 @@ def rejilla_AperturasCuadradas(no_rectangulos_por_mm, ventana, xx, yy):
             mascara += rectangulo_mascara
     return mascara
 
-import cv2
-import numpy as np
-from typing import Tuple
-
 def resize_with_pad(image: np.array, 
                     new_shape: Tuple[int, int], 
                     padding_color: Tuple[int] = (0, 0, 0)) -> np.array:
@@ -303,3 +302,6 @@ def resize_with_pad(image: np.array,
     # Agregar bordes para ajustar la imagen al tamaño deseado
     image = cv2.copyMakeBorder(image, top, bottom, left, right, cv2.BORDER_CONSTANT, value=padding_color)
     return image
+
+
+

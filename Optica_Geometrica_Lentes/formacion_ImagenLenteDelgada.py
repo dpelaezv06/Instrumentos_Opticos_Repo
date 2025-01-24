@@ -127,7 +127,7 @@ def imagen_SistemaShift(sistema, objeto, ventana_PosteriorX, pixeles_X, ventana_
     fase_Constante = np.exp(1j*numero_Onda*sistema["camino_EjeOptico"]) #el termino de fase constante, relativo a la longitud de camino optico que recorre el rayo que pasa por el centro del sistema
     fase_ParabolicaAnterior = np.exp((1j*numero_Onda*sistema["matriz_Sistema"][0,0]*(malla_XAnterior**2 + malla_YAnterior**2))/(2*sistema["matriz_Sistema"][0,1])) #fase parabolica que se debe aplicar relativa a las coordenadas del sistema en la salida
     fase_ParabolicaPosterior = np.exp((1j*numero_Onda*sistema["matriz_Sistema"][1,1]*(malla_XPosterior**2 + malla_YPosterior**2))/(2*sistema["matriz_Sistema"][0,1])) #fase parabolica que se debe aplicar relativa a las coordenadas del sistema en la entrada
-    transformada_Fresnel = (np.fft.ifft2(objeto*fase_ParabolicaAnterior)) #calculamos la transformada de fourier modificada, de la transformada de fresnel
+    transformada_Fresnel = (np.fft.fft2(objeto*fase_ParabolicaAnterior)) #calculamos la transformada de fourier modificada, de la transformada de fresnel
     campo_Salida = delta_XPosterior*delta_YPosterior*fase_Constante*fase_ParabolicaPosterior*transformada_Fresnel #calculamos el campo de salida multiplicando por las fases parabolicas y la transformada de fresnel 
     return campo_Salida #retornamos el campo a la salida del sistema
 
@@ -143,15 +143,13 @@ def diafragma_ParLentes(lente_Anterior, lente_Posterior, distancia_Lentes, vecto
     return 0
 
 
-
 ''' definicion de parametros del montaje experimental'''
 #caracteristicas del montaje y la ilimunacion
 longitud_Onda = 533E-9
-foco_LenteAnterior = 0.07
-foco_LentePosterior = 0.05
+foco_LenteAnterior = 500E-3
+foco_LentePosterior = 0.0565
 distancia_Adicional = 0.01
-distancia_Objeto = 0.3
-diametro_Diafragma = 180E-6
+diametro_Diafragma = 16E-5
 
 #calculo de las caracteristicas de cada sistema
 sistema_Anterior = [mat.propagacion(foco_LenteAnterior), mat.lente_Delgada(foco_LenteAnterior), mat.propagacion(foco_LenteAnterior)]
@@ -187,13 +185,13 @@ mascara = opt.resize_with_pad(mascara, [2448, 2048])
 
 campo_Anterior = imagen_Sistema(propiedad_SistemaAnterior, mascara, ancho_XVentanaDiafragma, pixeles_X, ancho_YVentanaDiafragma, pixeles_Y, longitud_Onda)
 
-diafragma_Campo = opt.funcion_Circulo(diametro_Diafragma/2, None, malla_XDiafragma, malla_YDiafragma)
+diafragma_Campo = opt.funcion_Rectangulo(diametro_Diafragma, diametro_Diafragma, None, malla_XDiafragma, malla_YDiafragma)
 campo_AnteriorDiafragma = diafragma_Campo * campo_Anterior
 
 campo_Salida = imagen_SistemaShift(propiedad_SistemaPosterior, campo_AnteriorDiafragma, longitud_SensorX, pixeles_X, longitud_SensorY, pixeles_Y, longitud_Onda)
 
-#graph.intensidad(mascara, ancho_XVentanaObjeto, ancho_YVentanaObjeto, 1, 1)
-#graph.intensidad(campo_Anterior,ancho_XVentanaDiafragma, ancho_YVentanaDiafragma, 1, 0.01)
-#graph.intensidad(campo_AnteriorDiafragma, ancho_XVentanaDiafragma, ancho_YVentanaDiafragma, 1, 0.01)
+graph.intensidad(mascara, ancho_XVentanaObjeto, ancho_YVentanaObjeto, 1, 1)
+graph.intensidad(campo_Anterior,ancho_XVentanaDiafragma, ancho_YVentanaDiafragma, 1, 0.01)
+graph.intensidad(campo_AnteriorDiafragma, ancho_XVentanaDiafragma, ancho_YVentanaDiafragma, 1, 0.01)
 graph.intensidad(campo_Salida, longitud_SensorX, longitud_SensorY, 1, 1)
 
