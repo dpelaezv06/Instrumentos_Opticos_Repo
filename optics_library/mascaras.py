@@ -132,6 +132,72 @@ def funcion_Rectangulo(base, altura, centro, xx, yy): #funcion para realizar una
 
     return mascara #retorno la mascara
 
+def funcion_Cruz(ancho_horizontal, ancho_vertical, xx, yy, centro=None):
+    '''
+    Crea una máscara con una cruz central formada por dos cintas de diferentes anchos (horizontal y vertical).
+    ENTRADAS:
+        ancho_horizontal == float (Ancho de la cinta horizontal)
+        ancho_vertical == float (Ancho de la cinta vertical)
+        centro == lista [X, Y] (Coordenadas del centro de la cruz, opcional)
+        xx, yy == malla de puntos en la cual se verá la cruz
+    RETORNO:
+        Mascara (Array 2D)
+    '''
+    if centro is None:  # Si no se especifica el centro de la cruz
+        centro = [0, 0]  # El centro default está en el origen
+
+    ''' Creación de la cinta horizontal '''
+    y_Minimo = centro[1] - ancho_horizontal / 2
+    y_Maximo = centro[1] + ancho_horizontal / 2
+
+    ''' Creación de la cinta vertical '''
+    x_Minimo = centro[0] - ancho_vertical / 2
+    x_Maximo = centro[0] + ancho_vertical / 2
+
+    # Máscara para la cinta horizontal
+    mascara_horizontal = (yy >= y_Minimo) & (yy <= y_Maximo)
+
+    # Máscara para la cinta vertical
+    mascara_vertical = (xx >= x_Minimo) & (xx <= x_Maximo)
+
+    # Máscara total: unión de la cinta horizontal y la cinta vertical
+    # Se usa OR (|) para que la transmitancia varíe entre 0 y 1
+    mascara = mascara_horizontal | mascara_vertical
+
+    return mascara  # Retorno de la máscara
+
+import numpy as np
+
+def funcion_CruzGaussiana(sigma_horizontal, sigma_vertical, xx, yy, centro=None):
+    '''
+    Crea una cruz con distribuciones gaussianas en los ejes horizontal y vertical.
+    ENTRADAS:
+        sigma_horizontal == float (Desviación estándar de la gaussiana horizontal)
+        sigma_vertical == float (Desviación estándar de la gaussiana vertical)
+        centro == lista [X, Y] (Coordenadas del centro de la cruz, opcional)
+        xx, yy == malla de puntos en la cual se verá la cruz
+    RETORNO:
+        Mascara (Array 2D) con valores entre 0 y 1
+    '''
+    if centro is None:  # Si no se especifica el centro de la cruz
+        centro = [0, 0]  # El centro default está en el origen
+
+    ''' Creación de la gaussiana horizontal '''
+    gauss_horizontal = np.exp(-((yy - centro[1])**2) / (2 * sigma_horizontal**2))
+
+    ''' Creación de la gaussiana vertical '''
+    gauss_vertical = np.exp(-((xx - centro[0])**2) / (2 * sigma_vertical**2))
+
+    ''' Cruz combinada: producto de las gaussianas '''
+    mascara = gauss_horizontal + gauss_vertical  # Se suman para formar la cruz
+
+    # Normalizar la máscara para que los valores estén entre 0 y 1
+    mascara = mascara / np.max(mascara)
+
+    return mascara  # Retorno de la máscara
+
+
+
 def producto_EspacioFrecuencia (intervalo, resolucion): #funcion que saca los intervalos relativos al producto espacio frecuencia y devuelve los deltas de espacio y de frecuencia
     ''' 
     Funcion que retorna los delta espacio y delta frecuencia para un muestreo particular
