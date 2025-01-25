@@ -147,9 +147,9 @@ def diafragma_ParLentes(lente_Anterior, lente_Posterior, distancia_Lentes, vecto
 #caracteristicas del montaje y la ilimunacion
 longitud_Onda = 533E-9
 foco_LenteAnterior = 500E-3
-foco_LentePosterior = 0.0565
-distancia_Adicional = 0.01
-diametro_Diafragma = 16E-5
+foco_LentePosterior = 100E-3
+distancia_Adicional = foco_LentePosterior
+diametro_Diafragma = 100E-3
 
 #calculo de las caracteristicas de cada sistema
 sistema_Anterior = [mat.propagacion(foco_LenteAnterior), mat.lente_Delgada(foco_LenteAnterior), mat.propagacion(foco_LenteAnterior)]
@@ -178,14 +178,15 @@ ancho_YVentanaObjeto = muestreo_Objeto["delta_YEntrada"] * pixeles_Y
 malla_XObjeto, malla_YObjeto = opt.malla_Puntos(pixeles_X, ancho_XVentanaDiafragma, pixeles_Y, ancho_YVentanaDiafragma)
 
 ''' creacion del objeto '''
-lado = 250E-6
+ancho_Filtro = 250E-6
 mascara = opt.img_to_array("images/Ruido_E04.png")
 mascara = opt.resize_with_pad(mascara, [2448, 2048])
 
 
 campo_Anterior = imagen_Sistema(propiedad_SistemaAnterior, mascara, ancho_XVentanaDiafragma, pixeles_X, ancho_YVentanaDiafragma, pixeles_Y, longitud_Onda)
 
-diafragma_Campo = opt.funcion_Rectangulo(diametro_Diafragma, diametro_Diafragma, None, malla_XDiafragma, malla_YDiafragma)
+diafragma_Campo = opt.funcion_Circulo(diametro_Diafragma/2, None, malla_YDiafragma, malla_YDiafragma)
+filtro = 
 campo_AnteriorDiafragma = diafragma_Campo * campo_Anterior
 
 campo_Salida = imagen_SistemaShift(propiedad_SistemaPosterior, campo_AnteriorDiafragma, longitud_SensorX, pixeles_X, longitud_SensorY, pixeles_Y, longitud_Onda)
