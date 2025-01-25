@@ -44,7 +44,7 @@ def intensidad_Logaritmica(campo, ventanaX, ventanaY):
 
 
 
-def fase(campo, ventana):
+def fase(campo, ventana_X, ventana_Y):
     ''' Grafica un mapa de fase del campo ingresado    
     ENTRADAS:
     - campo: campo optico al que se le quiere representar su distribucion de fase
@@ -53,7 +53,7 @@ def fase(campo, ventana):
     RETORNA: Nada, solo despliega una ventana emergente con el grafico de la distribucion de fase del campo optico que se quiere representar '''
 
     ''' Definir los parametros para poder realizar la grafica '''
-    limites_eje = np.array([-ventana/2, ventana/2, -ventana/2, ventana/2])
+    limites_eje = np.array([-ventana_X/2, ventana_X/2, -ventana_Y/2, ventana_Y/2])
     campo_Fase = np.angle(campo) #calculamos la intensidad del campo que se ponga en la entrada
 
     ''' GRAFICAR '''

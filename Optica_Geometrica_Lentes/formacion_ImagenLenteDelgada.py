@@ -213,5 +213,67 @@ campo_Salida = imagen_SistemaShift(propiedad_SistemaPosterior, campo_AnteriorDia
 #graph.intensidad(campo_Anterior,ancho_XVentanaDiafragma, ancho_YVentanaDiafragma, 1, 0.00001)
 #graph.intensidad(filtro, ancho_XVentanaDiafragma, ancho_YVentanaDiafragma)
 #graph.intensidad(campo_AnteriorDiafragma, ancho_XVentanaDiafragma, ancho_YVentanaDiafragma, 1, 0.00001)
-graph.intensidad(campo_Salida, longitud_SensorX, longitud_SensorY, 1, 1)
+#graph.intensidad(campo_Salida, longitud_SensorX, longitud_SensorY, 1, 1)
+
+''' Punto 3.2 '''
+
+''' definicion de parametros del montaje experimental'''
+#caracteristicas del montaje y la ilimunacion
+longitud_Onda = 533E-9
+foco_LenteAnterior = 10E-3
+foco_LentePosterior = 0.565248
+distancia_Adicional = foco_LentePosterior
+diametro_Diafragma = 7E-3
+
+#calculo de las caracteristicas de cada sistema
+sistema_Anterior = [mat.propagacion(foco_LenteAnterior), mat.lente_Delgada(foco_LenteAnterior), mat.propagacion(foco_LenteAnterior)]
+sistema_Posterior = [mat.propagacion(foco_LentePosterior), mat.lente_Delgada(foco_LentePosterior), mat.propagacion(distancia_Adicional)]
+
+propiedad_SistemaAnterior = mat.sistema_Optico(sistema_Anterior, foco_LenteAnterior)
+propiedad_SistemaPosterior = mat.sistema_Optico(sistema_Posterior, distancia_Adicional)
+
+#caracteristicas del sensor y parametros de muestreo... Pueden depender del sensor
+pixeles_X = 2448
+pixeles_Y = 2048
+tamano_Pixel = 3.45E-6
+longitud_SensorX = pixeles_X * tamano_Pixel
+longitud_SensorY = pixeles_Y * tamano_Pixel
+
+
+#calculo de ventana en el espacio de muestreo del diafragma
+muestreo_Diafragma = opt.muestreo_SegunSensorFresnel(pixeles_X, longitud_SensorX, propiedad_SistemaPosterior["matriz_Sistema"][0,1], longitud_Onda, pixeles_Y, longitud_SensorY)
+ancho_XVentanaDiafragma = muestreo_Diafragma["delta_XEntrada"] * pixeles_X
+ancho_YVentanaDiafragma = muestreo_Diafragma["delta_YEntrada"] * pixeles_Y
+malla_XDiafragma, malla_YDiafragma = opt.malla_Puntos(pixeles_X, ancho_XVentanaDiafragma, pixeles_Y, ancho_YVentanaDiafragma)
+
+muestreo_Objeto = opt.muestreo_SegunSensorFresnel(pixeles_X, ancho_XVentanaDiafragma, propiedad_SistemaAnterior["matriz_Sistema"][0,1], longitud_Onda, pixeles_Y, ancho_YVentanaDiafragma)
+ancho_XVentanaObjeto = muestreo_Objeto["delta_XEntrada"] * pixeles_X
+ancho_YVentanaObjeto = muestreo_Objeto["delta_YEntrada"] * pixeles_Y
+malla_XObjeto, malla_YObjeto = opt.malla_Puntos(pixeles_X, ancho_XVentanaObjeto, pixeles_Y, ancho_YVentanaObjeto)
+
+''' creacion del objeto '''
+mascara = opt.leer_CSV("images/MuestraBio_E04.csv")
+mascara = opt.resize_withComplexPad(mascara, [2048, 2448])
+
+
+campo_Lente = imagen_Sistema(propiedad_PropagacionEntrada, mascara, ancho_XVentanaLente, pixeles_X, ancho_YVentanaLente, pixeles_Y, longitud_Onda)
+diafragma_Campo = opt.funcion_Circulo(diametro_Diafragma/2, None, malla_YDiafragma, malla_YDiafragma)
+campo_LenteTamanoFinito = campo_Lente * diafragma_Campo
+campo_Anterior = imagen_SistemaShift(propiedad_SistemaAnterior, campo_LenteTamanoFinito, ancho_XVentanaDiafragma, pixeles_X, ancho_YVentanaDiafragma, pixeles_Y, longitud_Onda)
+filtro = opt.funcion_Anillo(1E-3, 80E-3,None, malla_XDiafragma, malla_YDiafragma)
+campo_AnteriorDiafragma = campo_Anterior * filtro
+
+campo_Salida = imagen_SistemaShift(propiedad_SistemaPosterior, campo_AnteriorDiafragma, longitud_SensorX, pixeles_X, longitud_SensorY, pixeles_Y, longitud_Onda)
+
+graph.intensidad(mascara, ancho_XVentanaObjeto, ancho_YVentanaObjeto)
+#graph.intensidad(campo_Lente, malla_XLente, malla_YLente)
+#graph.intensidad(campo_LenteTamanoFinito, malla_XLente, malla_YLente)
+graph.intensidad(campo_Anterior, ancho_XVentanaDiafragma, ancho_YVentanaDiafragma, 1, 0.001)
+graph.intensidad(filtro, ancho_XVentanaDiafragma, ancho_YVentanaDiafragma)
+graph.intensidad(campo_AnteriorDiafragma, ancho_XVentanaDiafragma, ancho_YVentanaDiafragma, 1, 0.001)
+graph.intensidad(campo_Salida, longitud_SensorX, longitud_SensorY)
+
+
+
+
 

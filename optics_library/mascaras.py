@@ -5,6 +5,7 @@ from tkinter import filedialog
 import cv2
 import random
 from typing import Tuple
+import pandas as pd
 
 '''Funciones para creación de máscaras'''
 
@@ -132,6 +133,31 @@ def funcion_Rectangulo(base, altura, centro, xx, yy): #funcion para realizar una
 
     return mascara #retorno la mascara
 
+def funcion_Anillo(diametro_interno, diametro_externo, centro, xx, yy):
+    '''
+    Crea una máscara con un anillo
+    ENTRADAS:
+        diametro_interno == float (Diámetro interno del anillo)
+        diametro_externo == float (Diámetro externo del anillo)
+        centro == lista [X, Y]
+        xx, yy == malla de puntos en la cual se verá el anillo
+    RETORNO:
+        Máscara (Array 2D)
+    '''
+    if centro is None:  # Si no se especifica el centro, se ubica por defecto en el origen
+        centro = [0, 0]
+        
+    # Calcular radios interno y externo
+    radio_interno = diametro_interno / 2
+    radio_externo = diametro_externo / 2
+    
+    # Distancia de cada punto en la malla al centro
+    distancia = np.sqrt((xx - centro[0])**2 + (yy - centro[1])**2)
+    
+    # Crear la máscara del anillo
+    mascara = (distancia <= radio_externo) & (distancia >= radio_interno)
+    
+    return mascara  # Retorna la máscara
 def funcion_Cruz(ancho_horizontal, ancho_vertical, xx, yy, centro=None):
     '''
     Crea una máscara con una cruz central formada por dos cintas de diferentes anchos (horizontal y vertical).
@@ -369,5 +395,55 @@ def resize_with_pad(image: np.array,
     image = cv2.copyMakeBorder(image, top, bottom, left, right, cv2.BORDER_CONSTANT, value=padding_color)
     return image
 
+def leer_CSV(ruta_archivo):
+    """
+    Lee un archivo CSV con números complejos en formato combinado (con `i` en lugar de `j`) en una estructura 2D.
+    """
+    datos = pd.read_csv(ruta_archivo, header=None)  # Leer el archivo CSV
+    
+    # Procesar cada celda para reemplazar 'i' por 'j' y convertir a números complejos
+    campo_complejo = datos.apply(lambda col: col.map(lambda x: complex(str(x).replace('i', 'j')))).values
+    
+    return campo_complejo
 
+
+
+import numpy as np
+
+def resize_withComplexPad(imagen, new_Shape: tuple[int, int]) -> np.array:
+    """
+    Redimensiona una imagen 2D (matriz de números complejos) añadiendo padding de ceros complejos.
+    
+    Parameters:
+    - imagen: np.array
+        Matriz original con números complejos.
+    - new_Shape: Tuple[int, int]
+        Dimensiones deseadas de la nueva matriz (filas, columnas).
+    
+    Returns:
+    - np.array
+        Nueva matriz redimensionada con ceros complejos como padding.
+    """
+    # Obtener las dimensiones actuales de la imagen
+    current_rows, current_cols = imagen.shape
+    new_rows, new_cols = new_Shape
+    
+    # Crear una nueva matriz rellena con ceros complejos
+    resized_image = np.ones((new_rows, new_cols), dtype=np.complex128)
+    
+    # Calcular los índices donde se copiará la imagen original
+    row_start = (new_rows - current_rows) // 2
+    col_start = (new_cols - current_cols) // 2
+    
+    # Ajustar los índices en caso de que la imagen original sea más grande que la nueva
+    row_end = row_start + current_rows
+    col_end = col_start + current_cols
+    
+    if row_start < 0 or col_start < 0:
+        raise ValueError("La nueva forma no puede ser menor que la original.")
+    
+    # Insertar la imagen original dentro del padding
+    resized_image[row_start:row_end, col_start:col_end] = imagen
+    
+    return resized_image
 
