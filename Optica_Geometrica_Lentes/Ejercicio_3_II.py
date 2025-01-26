@@ -9,7 +9,7 @@ import numpy as np
 #caracteristicas del montaje y la ilimunacion
 longitud_Onda = 533E-9
 foco_LenteAnterior = 10E-3
-foco_LentePosterior = 0.165
+foco_LentePosterior = 0.2
 distancia_Adicional = foco_LentePosterior
 radio_Filtro = 0.1E-3
 diametro_Lente = 7E-3
