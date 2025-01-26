@@ -3,6 +3,7 @@ import Optica_Geometrica_Lentes.Matrices_ABCD as mat
 import optics_library.mascaras as opt
 import Optica_Geometrica_Lentes.formacion_ImagenLenteDelgada as tlen
 import optics_library.graficas as graph
+import numpy as np
 
 ''' definicion de parametros del montaje experimental'''
 #caracteristicas del montaje y la ilimunacion
@@ -44,15 +45,20 @@ malla_XObjeto, malla_YObjeto = opt.malla_Puntos(pixeles_X, ancho_XVentanaObjeto,
 mascara = opt.leer_CSV("images/MuestraBio_E04.csv")
 mascara = opt.resize_withComplexPad(mascara, [2048, 2448]) 
 
+'''Creación del filtro'''
+for fase in range(0,100,100):
+    #desfase = np.exp(2j*np.pi*fase/100)
+    filtro = 1 + 1j*opt.funcion_GaussianaSimetrica(0.0005,malla_XDiafragma,malla_YDiafragma)*np.pi
+    graph.fase(filtro,ancho_XVentanaDiafragma,ancho_YVentanaDiafragma)
 
-campo_Anterior = tlen.imagen_Sistema(propiedad_SistemaAnterior, mascara, ancho_XVentanaDiafragma, pixeles_X, ancho_YVentanaDiafragma, pixeles_Y, longitud_Onda)
-filtro = 0.7*(opt.funcion_Anillo(radio_Filtro, diametro_Lente,None, malla_XDiafragma, malla_YDiafragma, opacidad_Filtro) * opt.funcion_CruzGaussiana(1.5E-3, 1.5E-3, malla_XDiafragma, malla_YDiafragma, None) * (opt.invertir_Array(opt.funcion_GaussianaSimetrica(150E-6, malla_XDiafragma, malla_YDiafragma))))+0.3
-campo_AnteriorDiafragma = campo_Anterior * filtro
+    campo_Anterior = tlen.imagen_Sistema(propiedad_SistemaAnterior, mascara, ancho_XVentanaDiafragma, pixeles_X, ancho_YVentanaDiafragma, pixeles_Y, longitud_Onda)
+    #filtro = 0.7*(opt.funcion_Anillo(radio_Filtro, diametro_Lente,None, malla_XDiafragma, malla_YDiafragma, opacidad_Filtro) * opt.funcion_CruzGaussiana(1.5E-3, 1.5E-3, malla_XDiafragma, malla_YDiafragma, None) * (opt.invertir_Array(opt.funcion_GaussianaSimetrica(150E-6, malla_XDiafragma, malla_YDiafragma))))+0.3
+    campo_AnteriorDiafragma = campo_Anterior * filtro
 
-campo_Salida = tlen.imagen_SistemaShift(propiedad_SistemaPosterior, campo_AnteriorDiafragma, longitud_SensorX, pixeles_X, longitud_SensorY, pixeles_Y, longitud_Onda)
+    campo_Salida = tlen.imagen_SistemaShift(propiedad_SistemaPosterior, campo_AnteriorDiafragma, longitud_SensorX, pixeles_X, longitud_SensorY, pixeles_Y, longitud_Onda)
 
-graph.fase(mascara, ancho_XVentanaObjeto, ancho_YVentanaObjeto)
-#graph.intensidad(campo_Anterior, ancho_XVentanaDiafragma, ancho_YVentanaDiafragma, 1, 0.001)
-#graph.intensidad(filtro, ancho_XVentanaDiafragma, ancho_YVentanaDiafragma)
-#graph.intensidad(campo_AnteriorDiafragma, ancho_XVentanaDiafragma, ancho_YVentanaDiafragma, 1, 0.001)
-graph.intensidad(campo_Salida, longitud_SensorX, longitud_SensorY, 1, 1)
+    #graph.fase(mascara, ancho_XVentanaObjeto, ancho_YVentanaObjeto)
+    #graph.intensidad(campo_Anterior, ancho_XVentanaDiafragma, ancho_YVentanaDiafragma, 1, 0.001)
+    #graph.intensidad(filtro, ancho_XVentanaDiafragma, ancho_YVentanaDiafragma)
+    #graph.intensidad(campo_AnteriorDiafragma, ancho_XVentanaDiafragma, ancho_YVentanaDiafragma, 1, 0.001)
+    graph.intensidad(campo_Salida, longitud_SensorX, longitud_SensorY, 1, 1)
