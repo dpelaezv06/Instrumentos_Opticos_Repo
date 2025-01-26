@@ -133,16 +133,18 @@ def funcion_Rectangulo(base, altura, centro, xx, yy): #funcion para realizar una
 
     return mascara #retorno la mascara
 
-def funcion_Anillo(diametro_interno, diametro_externo, centro, xx, yy):
+
+def funcion_Anillo(diametro_interno, diametro_externo, centro, xx, yy, opacidad_centro=0):
     '''
-    Crea una máscara con un anillo
+    Crea una máscara con un anillo, permitiendo controlar la opacidad del círculo central.
     ENTRADAS:
         diametro_interno == float (Diámetro interno del anillo)
         diametro_externo == float (Diámetro externo del anillo)
         centro == lista [X, Y]
         xx, yy == malla de puntos en la cual se verá el anillo
+        opacidad_centro == float (Valor de opacidad para el círculo central, por defecto 0)
     RETORNO:
-        Máscara (Array 2D)
+        Máscara (Array 2D) con valores que representan intensidades (opacidades)
     '''
     if centro is None:  # Si no se especifica el centro, se ubica por defecto en el origen
         centro = [0, 0]
@@ -154,10 +156,17 @@ def funcion_Anillo(diametro_interno, diametro_externo, centro, xx, yy):
     # Distancia de cada punto en la malla al centro
     distancia = np.sqrt((xx - centro[0])**2 + (yy - centro[1])**2)
     
-    # Crear la máscara del anillo
-    mascara = (distancia <= radio_externo) & (distancia >= radio_interno)
+    # Inicializar la máscara con ceros (fondo transparente)
+    mascara = np.zeros_like(xx, dtype=float)
     
-    return mascara  # Retorna la máscara
+    # Asignar opacidad para el círculo central
+    mascara[distancia < radio_interno] = opacidad_centro
+    
+    # Asignar valor 1 para el anillo
+    mascara[(distancia >= radio_interno) & (distancia <= radio_externo)] = 1
+    
+    return mascara # Retorna la máscara
+
 def funcion_Cruz(ancho_horizontal, ancho_vertical, xx, yy, centro=None):
     '''
     Crea una máscara con una cruz central formada por dos cintas de diferentes anchos (horizontal y vertical).
@@ -191,8 +200,6 @@ def funcion_Cruz(ancho_horizontal, ancho_vertical, xx, yy, centro=None):
     mascara = mascara_horizontal | mascara_vertical
 
     return mascara  # Retorno de la máscara
-
-import numpy as np
 
 def funcion_CruzGaussiana(sigma_horizontal, sigma_vertical, xx, yy, centro=None):
     '''
@@ -407,9 +414,6 @@ def leer_CSV(ruta_archivo):
     return campo_complejo
 
 
-
-import numpy as np
-
 def resize_withComplexPad(imagen, new_Shape: tuple[int, int]) -> np.array:
     """
     Redimensiona una imagen 2D (matriz de números complejos) añadiendo padding de ceros complejos.
@@ -429,7 +433,7 @@ def resize_withComplexPad(imagen, new_Shape: tuple[int, int]) -> np.array:
     new_rows, new_cols = new_Shape
     
     # Crear una nueva matriz rellena con ceros complejos
-    resized_image = np.ones((new_rows, new_cols), dtype=np.complex128)
+    resized_image = np.zeros((new_rows, new_cols), dtype=np.complex128)
     
     # Calcular los índices donde se copiará la imagen original
     row_start = (new_rows - current_rows) // 2
