@@ -140,6 +140,7 @@ def diafragma_Sistema(ventana, interfases):
 def diafragma_ParLentes(lente_Anterior, lente_Posterior, distancia_Lentes, vector_Entrada):
 
 
+<<<<<<< Updated upstream
     return 0
 
 
@@ -263,3 +264,6 @@ graph.intensidad(campo_Salida, longitud_SensorX, longitud_SensorY, 1, 1)
 
 
 
+=======
+    return 0
+>>>>>>> Stashed changes
