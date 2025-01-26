@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-def intensidad(campo, ventanaX, ventanaY, min=1, max=1):
+def intensidad(campo, ventanaX, ventanaY, min=0, max=1):
     ''' Grafica un patron de intensidad del campo ingresado    
     ENTRADAS:
     - campo: campo optico al que se le quiere representar su intensidad

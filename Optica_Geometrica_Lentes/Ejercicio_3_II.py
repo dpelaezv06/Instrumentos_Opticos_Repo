@@ -57,7 +57,7 @@ campo_AnteriorDiafragma = campo_Anterior * filtro
 campo_Salida = tlen.imagen_SistemaShift(propiedad_SistemaPosterior, campo_AnteriorDiafragma, longitud_SensorX, pixeles_X, longitud_SensorY, pixeles_Y, longitud_Onda)
 
 #graph.fase(mascara, ancho_XVentanaObjeto, ancho_YVentanaObjeto)
-#graph.intensidad(campo_Anterior, ancho_XVentanaDiafragma, ancho_YVentanaDiafragma, 1, 0.001)
+#graph.intensidad(campo_Anterior, ancho_XVentanaDiafragma, ancho_YVentanaDiafragma, 0, 0.001)
 #graph.intensidad(filtro, ancho_XVentanaDiafragma, ancho_YVentanaDiafragma)
-#graph.intensidad(campo_AnteriorDiafragma, ancho_XVentanaDiafragma, ancho_YVentanaDiafragma, 1, 0.001)
+#graph.intensidad(campo_AnteriorDiafragma, ancho_XVentanaDiafragma, ancho_YVentanaDiafragma, 0, 0.001)
 graph.intensidad(campo_Salida, longitud_SensorX, longitud_SensorY, 0.2 , 0.7)
