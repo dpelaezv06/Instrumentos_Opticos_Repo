@@ -47,15 +47,15 @@ mascara = opt.resize_withComplexPad(mascara, [2048, 2448])
 
 '''Creación del filtro'''
 
-filtro = 1 + 1j*opt.funcion_Circulo(radio_Filtro,None,malla_XDiafragma,malla_YDiafragma)
+filtro = 1 + np.exp(0.5j*np.pi)*opt.funcion_Circulo(radio_Filtro,None,malla_XDiafragma,malla_YDiafragma)
 graph.fase(filtro,ancho_XVentanaDiafragma,ancho_YVentanaDiafragma)
 
 campo_Anterior = tlen.imagen_Sistema(propiedad_SistemaAnterior, mascara, ancho_XVentanaDiafragma, pixeles_X, ancho_YVentanaDiafragma, pixeles_Y, longitud_Onda)
-#filtro = 0.7*(opt.funcion_Anillo(radio_Filtro, diametro_Lente,None, malla_XDiafragma, malla_YDiafragma, opacidad_Filtro) * opt.funcion_CruzGaussiana(1.5E-3, 1.5E-3, malla_XDiafragma, malla_YDiafragma, None) * (opt.invertir_Array(opt.funcion_GaussianaSimetrica(150E-6, malla_XDiafragma, malla_YDiafragma))))+0.3
 campo_AnteriorDiafragma = campo_Anterior * filtro
 
 campo_Salida = tlen.imagen_SistemaShift(propiedad_SistemaPosterior, campo_AnteriorDiafragma, longitud_SensorX, pixeles_X, longitud_SensorY, pixeles_Y, longitud_Onda)
 
+#graph.intensidad(mascara, ancho_XVentanaObjeto , ancho_YVentanaObjeto)
 #graph.fase(mascara, ancho_XVentanaObjeto, ancho_YVentanaObjeto)
 #graph.intensidad(campo_Anterior, ancho_XVentanaDiafragma, ancho_YVentanaDiafragma, 0, 0.001)
 #graph.intensidad(filtro, ancho_XVentanaDiafragma, ancho_YVentanaDiafragma)
