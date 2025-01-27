@@ -57,7 +57,7 @@ def fase(campo, ventana_X, ventana_Y):
     campo_Fase = np.angle(campo) #calculamos la intensidad del campo que se ponga en la entrada
 
     ''' GRAFICAR '''
-    plt.imshow(campo_Fase, extent = limites_eje, origin='lower', cmap='gray') #generamos la grafica
+    plt.imshow(campo_Fase, extent = limites_eje, origin='lower', cmap='viridis') #generamos la grafica
     plt.colorbar(label="Fase") #agregamos la barra de color para representar la distribucion de fase
     plt.xlabel("X (m)") #ponemos etiquetas en los ejes
     plt.ylabel("Y (m)") #ponemos etiquetas en los ejes
