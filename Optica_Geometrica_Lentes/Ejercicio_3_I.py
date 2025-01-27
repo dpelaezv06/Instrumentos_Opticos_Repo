@@ -13,7 +13,7 @@ diametro_Diafragma = 100E-3
 
 ancho_FiltroHorizontal = 450E-6
 ancho_FiltroVertical = 450E-6
-lado = 390E-6
+
 
 #calculo de las caracteristicas de cada sistema
 sistema_Anterior = [mat.propagacion(foco_LenteAnterior), mat.lente_Delgada(foco_LenteAnterior), mat.propagacion(foco_LenteAnterior)]
@@ -46,25 +46,26 @@ malla_XObjeto, malla_YObjeto = opt.malla_Puntos(pixeles_X, ancho_XVentanaObjeto,
 
 mascara = opt.img_to_array("images/Ruido_E04.png")
 mascara = opt.resize_with_pad(mascara, [2448, 2048])
+lado = 300E-6
 
-#filtro = opt.funcion_GaussianaSimetrica(ancho_Filtro, malla_XDiafragma, malla_YDiafragma)
-filtro = opt.funcion_Rectangulo(lado, lado, [-1.243E-3,0.254E-3], malla_XDiafragma, malla_YDiafragma)
-filtro |= opt.funcion_Rectangulo(lado, lado, [-0.403-3, 0.280E-3],malla_XDiafragma,malla_YDiafragma)
-filtro |= opt.funcion_Rectangulo(lado, lado, [0.435E-3, 0.228E-3],malla_XDiafragma,malla_YDiafragma)
-filtro |= opt.funcion_Rectangulo(lado, lado, [-0.403E-3, -0.192E-3],malla_XDiafragma,malla_YDiafragma)
-filtro |= opt.funcion_Rectangulo(lado, lado, [0.435E-3, -0.245E-3],malla_XDiafragma,malla_YDiafragma)
-filtro |= opt.funcion_Rectangulo(lado, lado, [1.281E-3, -0.216E-3],malla_XDiafragma,malla_YDiafragma)
-filtro |= opt.funcion_Rectangulo(lado, lado, [-0.406E-3, 0.279E-3],malla_XDiafragma,malla_YDiafragma)
+filtro = opt.funcion_GaussianaSimetrica(lado, malla_XDiafragma, malla_YDiafragma, -2.291E-3, 5.37E-4)
+filtro += opt.funcion_GaussianaSimetrica(lado, malla_XDiafragma, malla_YDiafragma, -7.75E-4, 6.04E-4)
+filtro += opt.funcion_GaussianaSimetrica(lado, malla_XDiafragma, malla_YDiafragma, 7.82E-4, 4.79E-4)
+filtro += opt.funcion_GaussianaSimetrica(lado, malla_XDiafragma, malla_YDiafragma, -7.75E-4, -4.45E-4)
+filtro += opt.funcion_GaussianaSimetrica(lado, malla_XDiafragma, malla_YDiafragma, 7.82E-4, -5.62E-4)
+filtro += opt.funcion_GaussianaSimetrica(lado, malla_XDiafragma, malla_YDiafragma, 2.324E-3, -5.07E-4)
+filtro += opt.funcion_GaussianaSimetrica(lado, malla_XDiafragma, malla_YDiafragma, 2.316E-3, 4.86E-4)
+filtro += opt.funcion_GaussianaSimetrica(lado, malla_XDiafragma, malla_YDiafragma, -2.293E-3, -4.45E-4)
 filtro = opt.invertir_Array(filtro)
+filtro = filtro * opt.funcion_Circulo(diametro_Diafragma/2, None, malla_XDiafragma, malla_YDiafragma)
 
 campo_Anterior = tlen.imagen_Sistema(propiedad_SistemaAnterior, mascara, ancho_XVentanaDiafragma, pixeles_X, ancho_YVentanaDiafragma, pixeles_Y, longitud_Onda)
-#filtro = 0.7*(opt.funcion_Anillo(radio_Filtro, diametro_Lente,None, malla_XDiafragma, malla_YDiafragma, opacidad_Filtro) * opt.funcion_CruzGaussiana(1.5E-3, 1.5E-3, malla_XDiafragma, malla_YDiafragma, None) * (opt.invertir_Array(opt.funcion_GaussianaSimetrica(150E-6, malla_XDiafragma, malla_YDiafragma))))+0.3
 campo_AnteriorDiafragma = campo_Anterior * filtro
 
 campo_Salida = tlen.imagen_SistemaShift(propiedad_SistemaPosterior, campo_AnteriorDiafragma, longitud_SensorX, pixeles_X, longitud_SensorY, pixeles_Y, longitud_Onda)
 
 graph.intensidad(mascara, ancho_XVentanaObjeto, ancho_YVentanaObjeto)
-graph.intensidad(campo_Anterior, ancho_XVentanaDiafragma, ancho_YVentanaDiafragma, 0, 0.001)
+graph.intensidad(campo_Anterior, ancho_XVentanaDiafragma, ancho_YVentanaDiafragma, 0, 0.00001)
 graph.intensidad(filtro, ancho_XVentanaDiafragma, ancho_YVentanaDiafragma)
-graph.intensidad(campo_AnteriorDiafragma, ancho_XVentanaDiafragma, ancho_YVentanaDiafragma, 0, 0.001)
+graph.intensidad(campo_AnteriorDiafragma, ancho_XVentanaDiafragma, ancho_YVentanaDiafragma, 0, 0.00001)
 graph.intensidad(campo_Salida, longitud_SensorX, longitud_SensorY, 0.2 , 0.7)
