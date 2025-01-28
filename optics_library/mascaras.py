@@ -103,11 +103,22 @@ def funcion_Circulo(radio, centro, xx, yy, opacidad = 1): #definicion de la func
 def funcion_GaussianaSimetrica(sigma, xx, yy, promediox = 0, promedioy = 0):
     ''' Funcion que representa una transmitancia gaussiana
     ENTRADAS:
-    sigma = '''
+    sigma = desviacion estandar de la gaussiana 
+    xx, yy = malla de puntos donde se va a crear la distribucion gaussiana
+    promeriox, promedio y = posiciones de ubicacion de los promedios de cada gaussiana 
+    RETORNA:
+    Malla de puntos del campo complejo de la transmitancia en forma de funcion gaussiana bidimensional'''
+
     transmitancia = np.exp(-((xx-promediox)**2)/(2*sigma**2)-((yy-promedioy)**2)/(2*sigma**2))
     return transmitancia
 
 def invertir_Array(campo):
+    ''' Funcion que invierte una transmitancia (cambia claros por oscuros y viceversa) 
+    ENTRADAS:
+    Campo complejo al cual se le quiere invertir sus valores
+    RETORNA:
+    Campo complejo invertido '''
+    
     campo_Invertido = 1 - campo
     return campo_Invertido
 

@@ -48,7 +48,7 @@ mascara = opt.resize_withComplexPad(mascara, [2048, 2448])
 '''Creación del filtro'''
 
 filtro = (1 + np.exp(0.5j*np.pi)*opt.funcion_Circulo(radio_Filtro,None,malla_XDiafragma,malla_YDiafragma)) * opt.funcion_Circulo(diametro_Lente, None, malla_XDiafragma, malla_YDiafragma)
-graph.fase(filtro,ancho_XVentanaDiafragma,ancho_YVentanaDiafragma)
+#graph.fase(filtro,ancho_XVentanaDiafragma,ancho_YVentanaDiafragma)
 
 campo_Anterior = tlen.imagen_Sistema(propiedad_SistemaAnterior, mascara, ancho_XVentanaDiafragma, pixeles_X, ancho_YVentanaDiafragma, pixeles_Y, longitud_Onda)
 campo_AnteriorDiafragma = campo_Anterior * filtro
