@@ -424,6 +424,9 @@ def leer_CSV(ruta_archivo):
     
     return campo_complejo
 
+def sinc(tamaño_disco, xx,yy):
+    transmitancia = np.sin(np.pi * xx/tamaño_disco)/(np.pi*xx/tamaño_disco) * np.sin(np.pi * yy/tamaño_disco)/(np.pi*yy/tamaño_disco)
+    return transmitancia
 
 def resize_withComplexPad(imagen, new_Shape: tuple[int, int]) -> np.array:
     """
