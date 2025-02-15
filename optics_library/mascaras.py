@@ -6,6 +6,7 @@ import cv2
 import random
 from typing import Tuple
 import pandas as pd
+from PIL import Image
 
 '''Funciones para creación de máscaras'''
 
@@ -465,3 +466,16 @@ def resize_withComplexPad(imagen, new_Shape: tuple[int, int]) -> np.array:
     
     return resized_image
 
+def read_tiff(file_path):
+    """
+    Lee un archivo .tiff y lo devuelve como un array de numpy.
+    
+    :param file_path: Ruta del archivo .tiff
+    :return: Imagen en formato numpy array
+    """
+    try:
+        with Image.open(file_path) as img:
+            return np.array(img)
+    except Exception as e:
+        print(f"Error al leer el archivo: {e}")
+        return None
