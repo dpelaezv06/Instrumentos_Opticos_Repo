@@ -484,6 +484,6 @@ def onda_inclinada(coseno_directorX , coseno_directorY , xx , yy , longitud_onda
     '''
     Función para ser capaz de usar una onda plana que incide de forma no normal a la superficie
     '''
-    transmitancia = np.exp(2*np.pi*(xx*(coseno_directorX/longitud_onda)+yy*(coseno_directorY/longitud_onda))) 
+    transmitancia = np.exp(2*1j*np.pi*(xx*(coseno_directorX/longitud_onda)+yy*(coseno_directorY/longitud_onda))) 
     return transmitancia
     
