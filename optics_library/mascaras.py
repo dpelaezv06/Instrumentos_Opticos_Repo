@@ -479,3 +479,12 @@ def read_tiff(file_path):
     except Exception as e:
         print(f"Error al leer el archivo: {e}")
         return None
+    
+def onda_inclinada( angulo_incidencia_xx , angulo_incidencia_yy , xx , yy , longitud_onda = 632.8E-9 ):
+    '''
+    Función para ser capaz de usar una onda plana que incide de forma no normal a la superficie
+    '''
+    transmitancia = np.exp(2*np.pi*(xx*(angulo_incidencia_xx/longitud_onda)+yy*(angulo_incidencia_yy/longitud_onda)))
+    #No pues, hace cosas... 
+    return transmitancia
+    
