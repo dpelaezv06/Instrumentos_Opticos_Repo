@@ -2,7 +2,7 @@ import Optica_Geometrica_Lentes.Matrices_ABCD as mat
 import optics_library.mascaras as opt
 import Optica_Geometrica_Lentes.formacion_ImagenLenteDelgada as tlen
 import optics_library.graficas as graph
-import numpy as np
+
 
 ''' definicion de parametros del montaje experimental'''
 #caracteristicas del montaje y la ilimunacion
