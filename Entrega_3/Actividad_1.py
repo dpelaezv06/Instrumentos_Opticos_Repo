@@ -41,8 +41,7 @@ malla_XObjeto, malla_YObjeto = opt.malla_Puntos(pixeles_X, ancho_XVentanaObjeto,
 
 
 ''' creacion del objeto '''
-
-mascara = opt.img_to_array("images\\USAF-1951.png") 
+mascara = opt.img_to_array("images/USAF-1951.png") 
 mascara = opt.resize_with_pad(mascara, [2848, 2848])
 #mascara = opt.funcion_Circulo(0.25E-6,None,malla_XObjeto,malla_YObjeto)
 diafragma = opt.funcion_Circulo(diametro_Diafragma/2, None, malla_XDiafragma, malla_YDiafragma)
