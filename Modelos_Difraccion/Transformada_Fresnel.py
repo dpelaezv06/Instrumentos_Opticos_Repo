@@ -1,7 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import optics_library.mascaras as opt
-import time
 
 ''' FUNCIONES PROPIAS DEL PROGRAMA'''
 
