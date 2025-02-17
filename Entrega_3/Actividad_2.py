@@ -28,8 +28,8 @@ pixeles_Y = 2048
 tamano_Pixel = 3.45E-6
 longitud_SensorX = pixeles_X * tamano_Pixel
 longitud_SensorY = pixeles_Y * tamano_Pixel
-coseno_directorX = -0.06264
-coseno_directorY = 0.03984
+coseno_directorX = -0.0627
+coseno_directorY = 0.0398
 
 
 #calculo de ventana en el espacio de muestreo del diafragma
@@ -58,14 +58,20 @@ campo_AnteriorDiafragma = campo_Anterior * diafragma * filtro #filtramos los ord
 
 campo_Salida = tlen.imagen_SistemaShift(propiedad_SistemaPosterior, campo_AnteriorDiafragma, longitud_SensorX, pixeles_X, longitud_SensorY, pixeles_Y, longitud_Onda)
 '''Con el campo de salida calculamos la fase del objeto del holograma'''
-fase_Salida = np.arccos(campo_Salida)+np.sqrt((coseno_directorX/longitud_Onda)**2+(coseno_directorY/longitud_Onda)**2)
+fase_Salida = -np.arccos(campo_Salida/(np.max(np.abs(campo_Salida))))+np.sqrt(1+(coseno_directorX/longitud_Onda)**2+(coseno_directorY/longitud_Onda)**2)
 
 '''Reconstruimos el holograma iluminando en la misma direccion en la cual fue creado y propagando la misma distancia con la cual fue creado'''
-holograma = mascara*fase_Salida* opt.onda_inclinada(coseno_directorX, coseno_directorY, malla_XObjeto, malla_YObjeto,longitud_Onda)
+holograma = mascara*np.exp(1j*fase_Salida)* opt.onda_inclinada(coseno_directorX, coseno_directorY, malla_XObjeto, malla_YObjeto,longitud_Onda)
 holograma = opt.resize_withComplexPad(holograma, [2448, 2448])
 
-reconstruccion = diff.transformada_Fresnel(holograma, ancho_XVentanaObjeto, 0.085, longitud_Onda)
+distancia_reconstruccion = 0.0858
+reconstruccion = diff.transformada_Fresnel(holograma, ancho_XVentanaObjeto, distancia_reconstruccion, longitud_Onda)
 #graph.intensidad(holograma, ancho_XVentanaObjeto, ancho_YVentanaObjeto)
 #graph.fase(holograma, ancho_XVentanaObjeto, ancho_YVentanaObjeto)
-graph.intensidad(reconstruccion, ancho_XVentanaObjeto, ancho_YVentanaObjeto)
-#graph.fase(reconstruccion, ancho_XVentanaObjeto, ancho_YVentanaObjeto)
+delta_Salida = opt.producto_EspacioFrecuenciaFresnel(longitud_Onda, distancia_reconstruccion, ancho_XVentanaObjeto, 2448)
+ancho_VentanaReconstruccion = delta_Salida["delta_Salida"]*2448
+
+
+graph.intensidad(holograma, ancho_XVentanaDiafragma, ancho_YVentanaDiafragma, 0, 0.6)
+graph.intensidad(np.fft.fftshift(reconstruccion), ancho_VentanaReconstruccion, ancho_VentanaReconstruccion, 0, 0.2)
+graph.fase(holograma, ancho_XVentanaObjeto, ancho_YVentanaObjeto)
