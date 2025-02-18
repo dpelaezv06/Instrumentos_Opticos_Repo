@@ -16,7 +16,7 @@ import optics_library.mascaras as diff
 
 ########################## CUIDADO!!!!! SOLO FUNCIONA CON VENTANAS CUADRADAS Y MUESTREOS UNIFORMES #######################
 
-def Intensidad_Antipropagante(Ruta_Campo_Intensidades, Distancia_z, Tamaño_pixel, longitud_onda = 632.8E-9):
+def Intensidad_Antipropagante(Campo_Intensidades, Distancia_z, Tamaño_pixel, longitud_onda = 632.8E-9):
     '''
     A partir de una imagen en escala de grises que representan la intensidad medida se obtiene la
     antipropagación a través del método de espectro angular
@@ -28,7 +28,7 @@ def Intensidad_Antipropagante(Ruta_Campo_Intensidades, Distancia_z, Tamaño_pixe
         Campo Óptico antipropagado
     '''
     numero_onda = 2*np.pi/longitud_onda
-    Intensidad_Medida = diff.img_to_array(Ruta_Campo_Intensidades)                               #Asignamos un array de valores de intensidad al array en función de la imagen Intensity.png, este el campo U[n,m,z]
+    Intensidad_Medida = Campo_Intensidades                               #Asignamos un array de valores de intensidad al array en función de la imagen Intensity.png, este el campo U[n,m,z]
     resolucion = len(Intensidad_Medida)                                                          #Se adquiere la resolución de la imagen de entrada
     ventana = resolucion * Tamaño_pixel                                                          #Se calcula el tamaño de la ventana
     deltas = diff.producto_EspacioFrecuencia(ventana, resolucion)                                #Regresa los delta espacio, frecuencia en un diccionario
