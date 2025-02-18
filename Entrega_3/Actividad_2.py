@@ -46,22 +46,25 @@ malla_XObjeto, malla_YObjeto = opt.malla_Puntos(pixeles_X, ancho_XVentanaObjeto,
 
 '''Las siguientes lineas son para extraer la informacion de fase del holograma'''
 
+
+radio_Filtro = 3E-4
 ''' creacion del objeto '''
 mascara = opt.read_tiff("images/Hologram.tiff")
 mascara = opt.resize_with_pad(mascara, [2448, 2048]) * opt.onda_inclinada(coseno_directorX, coseno_directorY, malla_XObjeto, malla_YObjeto,longitud_Onda)
 #mascara = opt.funcion_Circulo(0.25E-6,None,malla_XObjeto,malla_YObjeto)
 diafragma = opt.funcion_Circulo(diametro_Diafragma/2, None, malla_XDiafragma, malla_YDiafragma)
-filtro = opt.funcion_Circulo(6E-4,[-1.3E-3,8E-4], malla_XDiafragma, malla_YDiafragma) + opt.funcion_Circulo(6E-4, [1.2547E-3,-7.910E-4], malla_XDiafragma, malla_YDiafragma) 
+filtro = opt.funcion_Circulo(radio_Filtro,[-1.3E-3,8E-4], malla_XDiafragma, malla_YDiafragma) + opt.funcion_Circulo(radio_Filtro, [1.2547E-3,-7.910E-4], malla_XDiafragma, malla_YDiafragma) 
+filtro = opt.invertir_Array(filtro)
 
 campo_Anterior = tlen.imagen_Sistema(propiedad_SistemaAnterior, mascara, ancho_XVentanaDiafragma, pixeles_X, ancho_YVentanaDiafragma, pixeles_Y, longitud_Onda)
 campo_AnteriorDiafragma = campo_Anterior * diafragma * filtro #filtramos los ordenes 1 y -1 correspondientes a los terminos de interferencia
 
 campo_Salida = tlen.imagen_SistemaShift(propiedad_SistemaPosterior, campo_AnteriorDiafragma, longitud_SensorX, pixeles_X, longitud_SensorY, pixeles_Y, longitud_Onda)
 '''Con el campo de salida calculamos la fase del objeto del holograma'''
-fase_Salida = -np.arccos(campo_Salida/(np.max(np.abs(campo_Salida))))+np.sqrt(1+(coseno_directorX/longitud_Onda)**2+(coseno_directorY/longitud_Onda)**2)
+fase_Salida = -np.arccos(np.abs(campo_Salida)/(np.max(np.abs(campo_Salida))))+np.sqrt(1+(coseno_directorX/longitud_Onda)**2+(coseno_directorY/longitud_Onda)**2)
 
 '''Reconstruimos el holograma iluminando en la misma direccion en la cual fue creado y propagando la misma distancia con la cual fue creado'''
-holograma = mascara*np.exp(1j*fase_Salida)* opt.onda_inclinada(coseno_directorX, coseno_directorY, malla_XObjeto, malla_YObjeto,longitud_Onda)
+holograma = campo_Salida*np.exp(1j*fase_Salida)* opt.onda_inclinada(coseno_directorX, coseno_directorY, malla_XObjeto, malla_YObjeto,longitud_Onda)
 holograma = opt.resize_withComplexPad(holograma, [2448, 2448])
 
 distancia_reconstruccion = 0.0858
@@ -72,6 +75,8 @@ delta_Salida = opt.producto_EspacioFrecuenciaFresnel(longitud_Onda, distancia_re
 ancho_VentanaReconstruccion = delta_Salida["delta_Salida"]*2448
 
 
-graph.intensidad(holograma, ancho_XVentanaDiafragma, ancho_YVentanaDiafragma, 0, 0.6)
-graph.intensidad(np.fft.fftshift(reconstruccion), ancho_VentanaReconstruccion, ancho_VentanaReconstruccion, 0, 0.2)
-graph.fase(holograma, ancho_XVentanaObjeto, ancho_YVentanaObjeto)
+#graph.intensidad(campo_AnteriorDiafragma, ancho_XVentanaDiafragma, ancho_YVentanaDiafragma, 0, 0.001)
+
+#graph.intensidad(holograma, ancho_XVentanaDiafragma, ancho_YVentanaDiafragma, 0, 0.6)
+graph.intensidad(reconstruccion, ancho_VentanaReconstruccion, ancho_VentanaReconstruccion, 0, 0.7)
+#graph.fase(holograma, ancho_XVentanaObjeto, ancho_YVentanaObjeto)
