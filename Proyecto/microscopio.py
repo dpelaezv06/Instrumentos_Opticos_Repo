@@ -9,7 +9,7 @@ longitud_Onda = 632.8E-9 #longitud de onda usada en la iluminacion
 foco_objetivo = 50E-3 #distancia focal del objetivo de microscopio
 foco_lenteTubo = 200E-3  #distancia focal de la lente de tubo
 diametro_Diafragma = 6.03022E-3 #diametro de la pupila del objetivo de microscopio
-frecuencia = 90E3
+frecuencia = 92E3
 
 
 #calculo de las caracteristicas de cada sistema
@@ -40,8 +40,8 @@ muestreo_Objeto = opt.muestreo_SegunSensorFresnel(pixeles_X, ancho_XVentanaDiafr
 ancho_XVentanaObjeto = muestreo_Objeto["delta_XEntrada"] * pixeles_X #calculo de la ventana de muestreo de la muestra en el eje x
 ancho_YVentanaObjeto = muestreo_Objeto["delta_YEntrada"] * pixeles_Y #calculo de la ventana de muestreo de la muestra en el eje y
 malla_XObjeto, malla_YObjeto = opt.malla_Puntos(pixeles_X, ancho_XVentanaObjeto, pixeles_Y, ancho_YVentanaObjeto) #calculo de la malla de puntos que muestrea la muestra
-radio_filtro = 1.5E-3
-filtro = opt.funcion_Circulo(radio_filtro, None, malla_XDiafragma, malla_YDiafragma)
+ancho_filtro = 1.5E-3
+filtro = opt.funcion_Rectangulo(ancho_filtro, diametro_Diafragma, None, malla_XDiafragma, malla_YDiafragma)
 filtro = opt.invertir_Array(filtro)
 
 
