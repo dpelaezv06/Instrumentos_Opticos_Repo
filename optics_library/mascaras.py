@@ -487,7 +487,7 @@ def onda_inclinada(coseno_directorX , coseno_directorY , xx , yy , longitud_onda
     transmitancia = np.exp(2*1j*np.pi*(xx*(coseno_directorX/longitud_onda)+yy*(coseno_directorY/longitud_onda))) 
     return transmitancia
 
-def rejilla_difraccion(ancho_franja, xx, yy, opacidad_clara=1, opacidad_oscura=0):
+def rejilla_difraccion(ancho_franja, xx, yy, angulo = 90 ,opacidad_clara=1, opacidad_oscura=0):
     ''' 
     Crea una mascara con franjas verticales alternadas (claro-oscuro)
     
@@ -500,6 +500,11 @@ def rejilla_difraccion(ancho_franja, xx, yy, opacidad_clara=1, opacidad_oscura=0
     RETORNA:
         Máscara con franjas verticales alternadas
     '''
-    
-    mascara = np.where((xx // ancho_franja) % 2 == 0, opacidad_clara, opacidad_oscura)
+    if angulo == 90:  #Franjas verticales porque la tangente no está definida en 90 grados
+        mascara = np.where((xx // ancho_franja) % 2 == 0, opacidad_clara, opacidad_oscura)
+    else:
+        pendiente = np.tan(angulo * 3.141592/180)           #Convertir ángulo a pendiente
+        rejilla = (yy - pendiente * xx) // ancho_franja     
+        mascara = np.where(rejilla % 2 == 0, opacidad_clara, opacidad_oscura)
     return mascara
+   
