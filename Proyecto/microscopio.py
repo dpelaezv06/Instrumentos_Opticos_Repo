@@ -15,9 +15,15 @@ foco_anteriorIluminador = 25E-3
 diametro_Diafragma = 6.03022E-3 #diametro de la pupila del objetivo de microscopio
 
 #calculo de las caracteristicas de cada sistema
+sistema_anteriorIluminador = [mat.propagacion(foco_anteriorIluminador), mat.lente_Delgada(foco_anteriorIluminador), mat.propagacion(foco_anteriorIluminador)] #primera etapa del sistema de demagnificacion del iluminador
+sistema_posteriorIluminador = [mat.propagacion(foco_posteriorIluminador), mat.lente_Delgada(foco_posteriorIluminador), mat.propagacion(foco_posteriorIluminador)] #segunda etapa del sistema de demagnificacion del iluminador
+sistema_transformadaFourier = [mat.propagacion(foco_lenteFourier), mat.lente_Delgada(foco_lenteFourier), mat.propagacion(foco_lenteFourier)] #en esta etapa se hace la transformada de fourier de los deltas generados por el dmd
 sistema_objetivo = [mat.propagacion(foco_objetivo), mat.lente_Delgada(foco_objetivo), mat.propagacion(foco_objetivo)] #propiedades del sistema compuesto por el objetivo de microscopio
 sistema_lenteTubo = [mat.propagacion(foco_lenteTubo), mat.lente_Delgada(foco_lenteTubo), mat.propagacion(foco_lenteTubo)] #propiedades del sistema compuesto por la lente de tubo
 
+propiedad_sistemaAnteriorIluminador = mat.sistema_Optico(sistema_anteriorIluminador, foco_anteriorIluminador) #calculo de las propiedades del sistema compuesto por la primera lente del sistema de demagnificacion del iluminador
+propiedad_sistemaPosteriorIluminador = mat.sistema_Optico(sistema_posteriorIluminador, foco_posteriorIluminador) #calculo de las propiedades del sistema compuesto por la segunda lente del sistema demagnificador del iluminador
+propiedad_sistemaTransformadaFourier = mat.sistema_Optico(sistema_transformadaFourier, foco_lenteFourier) #propiedades del sistema conformado por la lente de fourier, la cual convierte el conjunto de deltas en un patron sinusoidal de intensidad
 propiedad_sistemaObjetivo = mat.sistema_Optico(sistema_objetivo, foco_objetivo) #calculo de las propiedades del sistema conformado por la lente del objetivo
 propiedad_sistemaLenteTubo = mat.sistema_Optico(sistema_lenteTubo, foco_lenteTubo) #calculo de las propiedades del sistema conformado por la lente de tubo
 
@@ -29,53 +35,57 @@ longitud_SensorX = pixeles_X * tamano_Pixel #calculo de las dimensiones fisicas 
 longitud_SensorY = pixeles_Y * tamano_Pixel #calculo de las dimensiones fisicas del sensor en el eje y
 
 
-
-
 ''' sistema de formacion de imagenes '''
 #calculo de ventana en el espacio de muestreo del diafragma
-muestreo_Diafragma = opt.muestreo_SegunSensorFresnel(pixeles_X, longitud_SensorX, propiedad_sistemaLenteTubo["matriz_Sistema"][0,1], longitud_Onda, pixeles_Y, longitud_SensorY) #propiedades de muestreo del diafragma del sistema considerando las caracteristicas de registro del sensor
-ancho_XVentanaDiafragma = muestreo_Diafragma["delta_XEntrada"] * pixeles_X #calculo de la ventana de muestreo del diafragma en el eje x
-ancho_YVentanaDiafragma = muestreo_Diafragma["delta_YEntrada"] * pixeles_Y #calculo de la ventana de muestreo del diafragma en el eje y
-malla_XDiafragma, malla_YDiafragma = opt.malla_Puntos(pixeles_X, ancho_XVentanaDiafragma, pixeles_Y, ancho_YVentanaDiafragma) #calculo de la malla de puntos que muestrea el diafragma
+muestreo_spliterImagen = opt.muestreo_SegunSensorFresnel(pixeles_X, longitud_SensorX, propiedad_sistemaLenteTubo["matriz_Sistema"][0,1], longitud_Onda, pixeles_Y, longitud_SensorY) #propiedades de muestreo del divisor de haz considerando las caracteristicas de registro del sensor
+ancho_XventanaSpliterImagen = muestreo_spliterImagen["delta_XEntrada"] * pixeles_X #calculo de la ventana de muestreo del divisor de haz en la direccion de formacion de imagenes
+ancho_YventanaSpliterImagen = muestreo_spliterImagen["delta_YEntrada"] * pixeles_Y #calculo de la ventana de muestreo del divisor de haz en la direccion de formacion de imagenes
+malla_XspliterImagen, malla_YspliterImagen = opt.malla_Puntos(pixeles_X, ancho_XventanaSpliterImagen, pixeles_Y, ancho_YventanaSpliterImagen) #calculo de la malla de puntos que muestrea el divisor de haz en la direccion de formacion de imagenes
 
-muestreo_Objeto = opt.muestreo_SegunSensorFresnel(pixeles_X, ancho_XVentanaDiafragma, propiedad_sistemaObjetivo["matriz_Sistema"][0,1], longitud_Onda, pixeles_Y, ancho_YVentanaDiafragma) #propiedades de muestreo del plano de la muestra del sistema considerando las caracteristicas de muestreo del diafragma
-ancho_XVentanaObjeto = muestreo_Objeto["delta_XEntrada"] * pixeles_X #calculo de la ventana de muestreo de la muestra en el eje x
-ancho_YVentanaObjeto = muestreo_Objeto["delta_YEntrada"] * pixeles_Y #calculo de la ventana de muestreo de la muestra en el eje y
-malla_XObjeto, malla_YObjeto = opt.malla_Puntos(pixeles_X, ancho_XVentanaObjeto, pixeles_Y, ancho_YVentanaObjeto) #calculo de la malla de puntos que muestrea la muestra
+muestreo_muestra = opt.muestreo_SegunSensorFresnel(pixeles_X, ancho_XventanaSpliterImagen, propiedad_sistemaObjetivo["matriz_Sistema"][0,1], longitud_Onda, pixeles_Y, ancho_YventanaSpliterImagen) #propiedades de muestreo del plano de la muestra considerando las caracteristicas de muestreo del divisor de haz en la direccion de formacion de imagenes
+ancho_XventanaMuestra = muestreo_muestra["delta_XEntrada"] * pixeles_X #calculo de la ventana de muestreo de la muestra en el eje x
+ancho_YventanaMuestra = muestreo_muestra["delta_YEntrada"] * pixeles_Y #calculo de la ventana de muestreo de la muestra en el eje y
+malla_Xmuestra, malla_Ymuestra = opt.malla_Puntos(pixeles_X, ancho_XventanaMuestra, pixeles_Y, ancho_YventanaMuestra) #calculo de la malla de puntos que muestrea la muestra
+
+''' sistema de iluminacion '''
+muestreo_spliterIluminador = opt.muestreo_SegunSensorFresnel(pixeles_X, ancho_XventanaMuestra, propiedad_sistemaObjetivo["matriz_Sistema"][0,1], longitud_Onda, pixeles_Y, ancho_YventanaMuestra) #propiedades de muestreo del plano del divisor de haz en la direccion del iluminador tenienddo el cuenta el muestreo sobre la muestra
+ancho_XventanaSpliterIluminador = muestreo_spliterIluminador["delta_XEntrada"] * pixeles_X #calculo de la ventana de muestreo del spliter en direccion del iluminador en el eje x
+ancho_YventanaSpliterIluminador = muestreo_spliterIluminador["delta_YEntrada"] * pixeles_Y #calculo de la ventana de muestreo del spliter en direccion del iluminador en el eje y
+malla_XspliterIluminador, malla_YspliterIluminador = opt.malla_Puntos(pixeles_X, ancho_XventanaSpliterIluminador, pixeles_Y, ancho_YventanaSpliterIluminador) #calculo de la malla de puntos que muestrea el spliter en la direccion del iluminador
+
+muestreo_patronDemagnificado = opt.muestreo_SegunSensorFresnel(pixeles_X, ancho_XventanaSpliterIluminador, propiedad_sistemaObjetivo["matriz_Sistema"][0,1], longitud_Onda, pixeles_Y, ancho_YventanaSpliterIluminador) #propiedades de muestreo del plano del patron de iluminacion demagnificado considerando las caracteristicas de muestreo del spliter en direccion del iluminador
+ancho_XventanaPatronDemagnificado = muestreo_patronDemagnificado["delta_XEntrada"] * pixeles_X #calculo de la ventana de muestreo de la muestra en el eje x
+ancho_YventanaPatronDemagnificado = muestreo_patronDemagnificado["delta_YEntrada"] * pixeles_Y #calculo de la ventana de muestreo de la muestra en el eje y
+malla_XpatronDemagnificado, malla_YpatronDemagnificado = opt.malla_Puntos(pixeles_X, ancho_XventanaPatronDemagnificado, pixeles_Y, ancho_YventanaPatronDemagnificado) #calculo de la malla de puntos que muestrea la muestra
+
+muestreo_lenteAnteriorDemagnificador = opt.muestreo_SegunSensorFresnel(pixeles_X, ancho_XventanaPatronDemagnificado, propiedad_sistemaObjetivo["matriz_Sistema"][0,1], longitud_Onda, pixeles_Y, ancho_YventanaPatronDemagnificado) #propiedades de muestreo del plano del patron de iluminacion demagnificado considerando las caracteristicas de muestreo del spliter en direccion del iluminador
+ancho_XventanaLenteAnteriorDemagnificador = muestreo_lenteAnteriorDemagnificador["delta_XEntrada"] * pixeles_X #calculo de la ventana de muestreo de la muestra en el eje x
+ancho_YventanaLenteAnteriorDemagnificador = muestreo_lenteAnteriorDemagnificador["delta_YEntrada"] * pixeles_Y #calculo de la ventana de muestreo de la muestra en el eje y
+malla_XlenteAnteriorDemagnificador, malla_YlenteAnteriorDemagnificador = opt.malla_Puntos(pixeles_X, ancho_XventanaLenteAnteriorDemagnificador, pixeles_Y, ancho_YventanaLenteAnteriorDemagnificador) #calculo de la malla de puntos que muestrea la muestra
+
+
+
+
+
+
+
+
 ancho_filtro = 1.5E-3
-filtroH = opt.funcion_Rectangulo(ancho_filtro, diametro_Diafragma, None, malla_XDiafragma, malla_YDiafragma)
+filtroH = opt.funcion_Rectangulo(ancho_filtro, diametro_Diafragma, None, malla_XspliterImagen, malla_YspliterImagen)
 filtroH = opt.invertir_Array(filtroH)
 
 
 ''' calculo de la imagen '''
 mascara = opt.img_to_array("images/USAF-1951.png")
-mascara = opt.resize_with_pad(mascara, [2448, 2048])
-mascaraH = mascara * 0.5*(1+np.cos(2*np.pi*malla_XObjeto*frecuencia))
-diafragma = opt.funcion_Circulo(diametro_Diafragma/2, None, malla_XDiafragma, malla_YDiafragma)
+mascara = opt.resize_with_pad(mascara, [4000, 3000])
+diafragma = opt.funcion_Circulo(diametro_Diafragma/2, None, malla_XspliterImagen, malla_YspliterImagen)
 
-campo_AnteriorH = tlen.imagen_Sistema(propiedad_sistemaObjetivo, mascaraH, ancho_XVentanaDiafragma, pixeles_X, ancho_YVentanaDiafragma, pixeles_Y, longitud_Onda)
+campo_AnteriorH = tlen.imagen_Sistema(propiedad_sistemaObjetivo, mascara, ancho_XVentanaDiafragma, pixeles_X, ancho_YVentanaDiafragma, pixeles_Y, longitud_Onda)
 campo_AnteriorDiafragmaH = campo_AnteriorH * diafragma * filtroH
 campo_SalidaH = tlen.imagen_SistemaShift(propiedad_sistemaLenteTubo, campo_AnteriorDiafragmaH, longitud_SensorX, pixeles_X, longitud_SensorY, pixeles_Y, longitud_Onda)
 
 
-graph.intensidad(mascaraH, ancho_XVentanaObjeto, ancho_YVentanaObjeto)
+graph.intensidad(mascara, ancho_XVentanaObjeto, ancho_YVentanaObjeto)
 graph.intensidad(campo_AnteriorH, ancho_XVentanaDiafragma, ancho_YVentanaDiafragma, 0, 0.001)
 graph.intensidad(campo_AnteriorDiafragmaH, ancho_XVentanaDiafragma, ancho_YVentanaDiafragma, 0, 0.001)
 graph.intensidad(campo_SalidaH, longitud_SensorX, longitud_SensorY)
-
-''' calculo de la imagen '''
-mascaraV = mascara * 0.5*(1+np.cos(2*np.pi*malla_YObjeto*frecuencia))
-diafragma = opt.funcion_Circulo(diametro_Diafragma/2, None, malla_XDiafragma, malla_YDiafragma)
-filtroV = opt.funcion_Rectangulo(diametro_Diafragma, ancho_filtro, None, malla_XDiafragma, malla_YDiafragma)
-filtroV = opt.invertir_Array(filtroV)
-
-campo_AnteriorV = tlen.imagen_Sistema(propiedad_sistemaObjetivo, mascaraV, ancho_XVentanaDiafragma, pixeles_X, ancho_YVentanaDiafragma, pixeles_Y, longitud_Onda)
-campo_AnteriorDiafragmaV = campo_AnteriorV * diafragma *filtroV
-campo_SalidaV = tlen.imagen_SistemaShift(propiedad_sistemaLenteTubo, campo_AnteriorDiafragmaV, longitud_SensorX, pixeles_X, longitud_SensorY, pixeles_Y, longitud_Onda)
-
-graph.intensidad(mascaraV, ancho_XVentanaObjeto, ancho_YVentanaObjeto)
-graph.intensidad(campo_AnteriorV, ancho_XVentanaDiafragma, ancho_YVentanaDiafragma, 0, 0.001)
-graph.intensidad(campo_AnteriorDiafragmaV, longitud_SensorX, longitud_SensorY, 0, 0.001)
-graph.intensidad(campo_SalidaV, longitud_SensorX, longitud_SensorY)
-
-graph.intensidad(campo_AnteriorH, )
