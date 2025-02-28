@@ -486,3 +486,20 @@ def onda_inclinada(coseno_directorX , coseno_directorY , xx , yy , longitud_onda
     '''
     transmitancia = np.exp(2*1j*np.pi*(xx*(coseno_directorX/longitud_onda)+yy*(coseno_directorY/longitud_onda))) 
     return transmitancia
+
+def rejilla_difraccion(ancho_franja, xx, yy, opacidad_clara=1, opacidad_oscura=0):
+    ''' 
+    Crea una mascara con franjas verticales alternadas (claro-oscuro)
+    
+    ENTRADAS:
+        anchura_franja == ancho de cada franja vertical
+        xx, yy == malla de puntos bidimensional en la cual se crean las franjas
+        opacidad_clara == valor de la transmitancia en las franjas claras
+        opacidad_oscura == valor de la transmitancia en las franjas oscuras
+    
+    RETORNA:
+        Máscara con franjas verticales alternadas
+    '''
+    
+    mascara = np.where((xx // ancho_franja) % 2 == 0, opacidad_clara, opacidad_oscura)
+    return mascara
