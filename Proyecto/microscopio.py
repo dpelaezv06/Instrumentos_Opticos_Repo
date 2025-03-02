@@ -10,9 +10,10 @@ longitud_Onda = 632.8E-9 #longitud de onda usada en la iluminacion
 foco_lenteTubo = 200E-3  #distancia focal de la lente de tubo
 foco_objetivo = 50E-3 #distancia focal del objetivo de microscopio
 foco_lenteFourier = 200E-3
-foco_posteriorIluminador = 50E-3
-foco_anteriorIluminador = 50E-3
+foco_posteriorIluminador = 30E-3
+foco_anteriorIluminador = 80E-3
 diametro_Diafragma = 6.03022E-3 #diametro de la pupila del objetivo de microscopio
+ancho_franjaEspejos = 5
 
 #calculo de las caracteristicas de cada sistema
 sistema_anteriorIluminador = [mat.propagacion(foco_anteriorIluminador), mat.lente_Delgada(foco_anteriorIluminador), mat.propagacion(foco_anteriorIluminador)] #primera etapa del sistema de demagnificacion del iluminador
@@ -70,37 +71,35 @@ malla_XpatronDMD, malla_YpatronDMD = opt.malla_Puntos(pixeles_X, ancho_XventanaP
 
 
 ''' simulacion de las imagnes que obtiene el microscopio '''
+filtro = opt.funcion_Circulo(1E-3, None, malla_XlenteAnteriorDemagnificador, malla_YlenteAnteriorDemagnificador)
+filtro = opt.invertir_Array(filtro)
+
+
+
 
 ''' sistema de iluminacion '''
 lado_ordenesDifraccion = 5.4E-6 #longitud del lado de los cuadrados que componen el patron de difraccion del dmd usando en el sistema de iluminacion
 posicion_primerOrden = 7E-3 #posicion de los primeros ordenes de difraccion 1 y -1 que genera el patron de difraccion del dmd, se usan para codificar la frecuencia del patron sinusoidal con el que se va a iluminar
-patron_DMD = opt.rejilla_difraccion(tamano_microespejo, malla_XpatronDMD, malla_YpatronDMD)
-campo_bloqueo = tlen.imagen_Sistema(propiedad_sistemaAnteriorIluminador, patron_DMD, ancho_XventanaLenteAnteriorDemagnificador, pixeles_X,  ancho_YventanaLenteAnteriorDemagnificador, pixeles_Y, longitud_Onda)
+patron_DMD = opt.rejilla_difraccion(ancho_franjaEspejos*tamano_microespejo, malla_XpatronDMD, malla_YpatronDMD)
+campo_bloqueo = tlen.imagen_Sistema(propiedad_sistemaAnteriorIluminador, patron_DMD, ancho_XventanaLenteAnteriorDemagnificador, pixeles_X,  ancho_YventanaLenteAnteriorDemagnificador, pixeles_Y, longitud_Onda) * filtro
 campo_iluminadorDemagnificado = tlen.imagen_SistemaShift(propiedad_sistemaPosteriorIluminador, campo_bloqueo, ancho_XventanaPatronDemagnificado, pixeles_X,  ancho_YventanaPatronDemagnificado, pixeles_Y, longitud_Onda)
 campo_lenteFourier = tlen.imagen_SistemaShift(propiedad_sistemaTransformadaFourier, campo_iluminadorDemagnificado, ancho_XventanaSpliterIluminador, pixeles_X,  ancho_YventanaSpliterIluminador, pixeles_Y, longitud_Onda)
 campo_muestra = tlen.imagen_SistemaShift(propiedad_sistemaObjetivo, campo_lenteFourier, ancho_XventanaMuestra, pixeles_X,  ancho_YventanaMuestra, pixeles_Y, longitud_Onda)
-campo_espectroMuestra = tlen.imagen_SistemaShift(propiedad_sistemaObjetivo, campo_muestra, ancho_XventanaSpliterImagen, pixeles_X,  ancho_YventanaSpliterImagen, pixeles_Y, longitud_Onda)
+muestra = opt.img_to_array("images/USAF-1951.png")
+muestra = opt.resize_with_pad(muestra, [4000, 3000])
+muestra_iluminada = muestra * campo_muestra
+diafragma = opt.funcion_Circulo(diametro_Diafragma/2, None, malla_XspliterImagen, malla_YspliterImagen)
+campo_espectroMuestra = tlen.imagen_SistemaShift(propiedad_sistemaObjetivo, muestra_iluminada, ancho_XventanaSpliterImagen, pixeles_X,  ancho_YventanaSpliterImagen, pixeles_Y, longitud_Onda) * diafragma
 campo_sensor = tlen.imagen_SistemaShift(propiedad_sistemaLenteTubo, campo_espectroMuestra, longitud_SensorX, pixeles_X,  longitud_SensorY, pixeles_Y, longitud_Onda)
 
 
 
-graph.intensidad(patron_DMD, ancho_XventanaPatronDMD, ancho_YventanaPatronDMD)
-graph.intensidad(campo_bloqueo, ancho_XventanaLenteAnteriorDemagnificador, ancho_YventanaLenteAnteriorDemagnificador)
-graph.intensidad(campo_iluminadorDemagnificado, ancho_XventanaPatronDemagnificado, ancho_YventanaPatronDemagnificado)
-graph.intensidad(campo_lenteFourier, ancho_XventanaSpliterIluminador, ancho_YventanaSpliterIluminador)
-graph.intensidad(campo_muestra, ancho_XventanaMuestra, ancho_YventanaMuestra)
-
-# ''' calculo de la imagen '''
-# mascara = opt.img_to_array("images/USAF-1951.png")
-# mascara = opt.resize_with_pad(mascara, [4000, 3000])
-# diafragma = opt.funcion_Circulo(diametro_Diafragma/2, None, malla_XspliterImagen, malla_YspliterImagen)
-
-# campo_Anterior = tlen.imagen_Sistema(propiedad_sistemaObjetivo, mascara, ancho_XVentanaDiafragma, pixeles_X, ancho_YVentanaDiafragma, pixelesq_Y, longitud_Onda)
-# campo_AnteriorDiafragma = campo_AnteriorH * diafragma * filtroH
-# campo_SalidaH = tlen.imagen_SistemaShift(propiedad_sistemaLenteTubo, campo_AnteriorDiafragmaH, longitud_SensorX, pixeles_X, longitud_SensorY, pixeles_Y, longitud_Onda)
-
-
-# graph.intensidad(mascara, ancho_XVentanaObjeto, ancho_YVentanaObjeto)
-# graph.intensidad(campo_AnteriorH, ancho_XVentanaDiafragma, ancho_YVentanaDiafragma, 0, 0.001)
-# graph.intensidad(campo_AnteriorDiafragmaH, ancho_XVentanaDiafragma, ancho_YVentanaDiafragma, 0, 0.001)
-# graph.intensidad(campo_SalidaH, longitud_SensorX, longitud_SensorY)
+#graph.intensidad(patron_DMD, ancho_XventanaPatronDMD, ancho_YventanaPatronDMD)
+#graph.intensidad(campo_bloqueo, ancho_XventanaLenteAnteriorDemagnificador, ancho_YventanaLenteAnteriorDemagnificador, 0, 0.1)
+#graph.intensidad(campo_iluminadorDemagnificado, ancho_XventanaPatronDemagnificado, ancho_YventanaPatronDemagnificado)
+#graph.intensidad(campo_lenteFourier, ancho_XventanaSpliterIluminador, ancho_YventanaSpliterIluminador)
+#graph.intensidad(campo_muestra, ancho_XventanaMuestra, ancho_YventanaMuestra)
+#graph.intensidad(muestra, ancho_XventanaMuestra, ancho_YventanaMuestra)
+#graph.intensidad(muestra_iluminada, ancho_XventanaMuestra, ancho_YventanaMuestra)
+#graph.intensidad(campo_espectroMuestra, ancho_XventanaSpliterImagen, ancho_YventanaSpliterImagen, 0, 0.00001)
+graph.intensidad(campo_sensor, longitud_SensorX, longitud_SensorY)
