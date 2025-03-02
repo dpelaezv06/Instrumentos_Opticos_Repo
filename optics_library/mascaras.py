@@ -503,7 +503,7 @@ def rejilla_difraccion(ancho_franja, xx, yy, angulo = 90 ,opacidad_clara=1, opac
     if angulo == 90:  #Franjas verticales porque la tangente no está definida en 90 grados
         mascara = np.where((xx // ancho_franja) % 2 == 0, opacidad_clara, opacidad_oscura)
     else:
-        pendiente = np.tan(angulo * 3.141592/180)           #Convertir ángulo a pendiente
+        pendiente = np.tan(angulo * np.pi/180)           #Convertir ángulo a pendiente
         rejilla = (yy - pendiente * xx) // ancho_franja     
         mascara = np.where(rejilla % 2 == 0, opacidad_clara, opacidad_oscura)
     return mascara
