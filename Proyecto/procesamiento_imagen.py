@@ -1,7 +1,7 @@
 import numpy as np
 from scipy.ndimage import shift
 
-def desplazar_mapa_alturas(mapa, x_min, x_max, y_min, y_max, distancia, angulo):
+def desplazar_imagen(imagen, x_min, x_max, y_min, y_max, distancia, angulo):
     """
     Desplaza un mapa de alturas en una dirección y magnitud especificadas.
 
@@ -30,3 +30,5 @@ def desplazar_mapa_alturas(mapa, x_min, x_max, y_min, y_max, distancia, angulo):
     mapa_desplazado = shift(mapa, shift=(desplazamiento_y, desplazamiento_x), mode='constant', cval=0, order=0)
 
     return mapa_desplazado
+
+
