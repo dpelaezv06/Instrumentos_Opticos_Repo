@@ -21,12 +21,12 @@ def desplazar_imagen(imagen, x_min, x_max, y_min, y_max, distancia, angulo):
     pixel_x = (x_max - x_min) / columnas #asignamos un tamano fisico a la imagen
     pixel_y = (y_max - y_min) / filas
 
-    desplazamiento_x = distancia * np.cos(np.radians(angulo)) / pixel_x #se convierte la distancia de desplazamiento en pixeles
-    desplazamiento_y = -distancia * np.sin(np.radians(angulo)) / pixel_y  #es necesario que sea negativo, porque al tratarse de una matriz, el numero del pixel crece hacia abajo
-
+    desplazamiento_x = distancia * np.cos(np.pi * angulo / 180) / pixel_x #se convierte la distancia de desplazamiento en pixeles
+    desplazamiento_y = -distancia * np.sin(np.pi * angulo / 180) / pixel_y #es necesario que sea negativo, porque al tratarse de una matriz, el numero del pixel crece hacia abajo
 
     imagen_desplazada = shift(imagen, shift=(desplazamiento_y, desplazamiento_x), mode='constant', cval=0, order=0) #desplazamos la imagen y rellenamos los vacios con cero
 
     return imagen_desplazada #retornamos la imagen desplazada 
 
 
+def distancia_desplazamiento
