@@ -9,11 +9,11 @@ import numpy as np
 longitud_Onda = 632.8E-9 #longitud de onda usada en la iluminacion
 foco_lenteTubo = 200E-3  #distancia focal de la lente de tubo
 foco_objetivo = 50E-3 #distancia focal del objetivo de microscopio
-foco_lenteFourier = 200E-3
+foco_lenteFourier = 150E-3
 foco_posteriorIluminador = 40E-3
 foco_anteriorIluminador = 100E-3
 diametro_Diafragma = 6.03022E-3 #diametro de la pupila del objetivo de microscopio
-ancho_franjaEspejos = 9
+ancho_franjaEspejos = 8
 
 #calculo de las caracteristicas de cada sistema
 sistema_anteriorIluminador = [mat.propagacion(foco_anteriorIluminador), mat.lente_Delgada(foco_anteriorIluminador), mat.propagacion(foco_anteriorIluminador)] #primera etapa del sistema de demagnificacion del iluminador
@@ -95,7 +95,7 @@ campo_sensor = tlen.imagen_SistemaShift(propiedad_sistemaLenteTubo, espectro_pup
 
 
 
-#graph.intensidad(patron_DMD, ancho_XventanaPatronDMD, ancho_YventanaPatronDMD)
+graph.intensidad(patron_DMD, ancho_XventanaPatronDMD, ancho_YventanaPatronDMD)
 graph.intensidad(campo_bloqueo, ancho_XventanaLenteAnteriorDemagnificador, ancho_YventanaLenteAnteriorDemagnificador, 0, 0.01)
 #graph.intensidad(campo_iluminadorDemagnificado, ancho_XventanaPatronDemagnificado, ancho_YventanaPatronDemagnificado)
 #graph.intensidad(campo_lenteFourier, ancho_XventanaSpliterIluminador, ancho_YventanaSpliterIluminador)
