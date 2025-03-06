@@ -33,8 +33,6 @@ def frecuencia_muestra(objetivo = 50E-3, lente_fourier = 150E-3, lente_posterior
     frecuencia_espacial = 1 / periodo_espacial
     return frecuencia_espacial
 
-
-
 def desplazamiento_frecuencia(frecuencia, angulo, distancia_focal = 50E-3, longitud_onda = 632.8E-9):
     desplazamiento = frecuencia * longitud_onda * distancia_focal
     return desplazamiento

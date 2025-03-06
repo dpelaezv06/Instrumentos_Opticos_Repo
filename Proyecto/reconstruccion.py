@@ -14,6 +14,7 @@ foco_anteriorIluminador = 100E-3
 diametro_Diafragma = 6.03022E-3 #diametro de la pupila del objetivo de microscopio
 ancho_franjaEspejos = 7
 angulo = -45
+pupila_sistetica = 0
 
 lista_imagenes = []
 lista_desplazamientos = []
@@ -88,17 +89,27 @@ malla_XpatronDMD, malla_YpatronDMD = opt.malla_Puntos(pixeles_X, ancho_XventanaP
 
 espectro_imagen = 0
 
-print(lista_imagenes)
+angulo = -45
 
-for iteracion in range(0, len(lista_imagenes) - 1):
+pupila_sistetica = opt.funcion_Circulo(diametro_Diafragma/2, None, malla_XspliterImagen, malla_YspliterImagen)
+filtro = opt.funcion_Circulo(diametro_Diafragma/1000, None, malla_XspliterImagen, malla_YspliterImagen)
+filtro = opt.invertir_Array(filtro)
+
+angulo = -45
+for iteracion in range(0, len(lista_imagenes)):
     angulo = angulo + 45
-    fourier = np.fft.fftshift(np.fft.fft2(lista_imagenes[iteracion]))
-    imagen_desplazadaMas = img.desplazar_imagen(fourier, -ancho_XventanaSpliterImagen/2, ancho_XventanaSpliterImagen/2, -ancho_YventanaSpliterImagen/2, ancho_YventanaSpliterImagen/2, lista_desplazamientos[iteracion], angulo)
-    imagen_desplazadaMenos = img.desplazar_imagen(fourier, -ancho_XventanaSpliterImagen/2, ancho_XventanaSpliterImagen/2, -ancho_YventanaSpliterImagen/2, ancho_YventanaSpliterImagen/2, -lista_desplazamientos[iteracion], angulo)
+    fourier = np.fft.fftshift(np.fft.fft2(lista_imagenes[iteracion])) * (pupila_sistetica & filtro)
+    imagen_desplazadaMas = img.desplazar_imagen(fourier, -ancho_XventanaSpliterImagen/2, ancho_XventanaSpliterImagen/2, -ancho_YventanaSpliterImagen/2, ancho_YventanaSpliterImagen/2, -0.5*lista_desplazamientos[iteracion], angulo + 90)
+    imagen_desplazadaMenos = img.desplazar_imagen(fourier, -ancho_XventanaSpliterImagen/2, ancho_XventanaSpliterImagen/2, -ancho_YventanaSpliterImagen/2, ancho_YventanaSpliterImagen/2, 0.5*lista_desplazamientos[iteracion], angulo + 90)
     espectro_imagen = espectro_imagen + imagen_desplazadaMas + imagen_desplazadaMenos
-    #graph.intensidad_Logaritmica(espectro_imagen, ancho_XventanaSpliterImagen, ancho_YventanaSpliterImagen)
+    #graph.intensidad_Logaritmica(fourier, ancho_XventanaSpliterImagen, ancho_YventanaSpliterImagen)
+    #graph.intensidad_Logaritmica(imagen_desplazadaMas, ancho_XventanaSpliterImagen, ancho_YventanaSpliterImagen)
+    #graph.intensidad_Logaritmica(imagen_desplazadaMenos, ancho_XventanaSpliterImagen, ancho_YventanaSpliterImagen)
+    graph.intensidad_Logaritmica(espectro_imagen, ancho_XventanaSpliterImagen, ancho_YventanaSpliterImagen)
+    
 
-#graph.intensidad_Logaritmica(espectro_imagen, ancho_XventanaSpliterImagen, ancho_YventanaSpliterImagen)
+espectro_imagen = espectro_imagen
+graph.intensidad_Logaritmica(espectro_imagen, ancho_XventanaSpliterImagen, ancho_YventanaSpliterImagen)
 
 imagen_reconstruida = np.fft.ifft2(espectro_imagen)
-graph.intensidad(imagen_reconstruida, longitud_SensorX, longitud_SensorY, 0, 0.1)
+graph.intensidad(imagen_reconstruida, longitud_SensorX, longitud_SensorY, 0, 0.3)
