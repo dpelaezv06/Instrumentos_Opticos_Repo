@@ -1,11 +1,10 @@
-import Optica_Geometrica_Lentes.Matrices_ABCD as mat
-import optics_library.mascaras as opt
-import Optica_Geometrica_Lentes.formacion_ImagenLenteDelgada as tlen
-import optics_library.graficas as graph
 import procesamiento_imagen as img
 import numpy as np
+import optics_library.mascaras as opt
+import Optica_Geometrica_Lentes.formacion_ImagenLenteDelgada as tlen
+import Optica_Geometrica_Lentes.Matrices_ABCD as mat
+import optics_library.graficas as graph
 
-''' definicion de parametros del montaje experimental para la formacion de imagenes '''
 longitud_Onda = 632.8E-9 #longitud de onda usada en la iluminacion
 foco_lenteTubo = 200E-3  #distancia focal de la lente de tubo
 foco_objetivo = 50E-3 #distancia focal del objetivo de microscopio
@@ -14,6 +13,24 @@ foco_posteriorIluminador = 40E-3
 foco_anteriorIluminador = 100E-3
 diametro_Diafragma = 6.03022E-3 #diametro de la pupila del objetivo de microscopio
 ancho_franjaEspejos = 7
+angulo = -45
+
+lista_imagenes = []
+lista_desplazamientos = []
+
+frecuencia = img.frecuencia_muestra()
+desplazamiento_0 = img.desplazamiento_frecuencia(frecuencia, 0, foco_objetivo)
+desplazamiento_45 = img.desplazamiento_frecuencia(frecuencia, 45, foco_objetivo)
+desplazamiento_90 = img.desplazamiento_frecuencia(frecuencia, 90, foco_objetivo)
+desplazamiento_menos45 = img.desplazamiento_frecuencia(frecuencia, -45, foco_objetivo)
+
+imagen0 = opt.read_tiff('Proyecto/Images/0_grados_7_espejos.tiff')
+imagen45 = opt.read_tiff('Proyecto/Images/45_grados_7_espejo.tiff')
+imagen90 = opt.read_tiff('Proyecto/Images/90_grados_7_espejos.tiff')
+imagen_menos45 = opt.read_tiff('Proyecto/Images/-45_grados_7_espejos.tiff')
+
+lista_imagenes = [imagen0, imagen45, imagen90, imagen_menos45]
+lista_desplazamientos = [desplazamiento_0, desplazamiento_45, desplazamiento_90, desplazamiento_menos45]
 
 #calculo de las caracteristicas de cada sistema
 sistema_anteriorIluminador = [mat.propagacion(foco_anteriorIluminador), mat.lente_Delgada(foco_anteriorIluminador), mat.propagacion(foco_anteriorIluminador)] #primera etapa del sistema de demagnificacion del iluminador
@@ -69,40 +86,19 @@ ancho_XventanaPatronDMD = muestreo_patronDMD["delta_XEntrada"] * pixeles_X #calc
 ancho_YventanaPatronDMD = muestreo_patronDMD["delta_YEntrada"] * pixeles_Y #calculo de la ventana de muestreo de la muestra en el eje y
 malla_XpatronDMD, malla_YpatronDMD = opt.malla_Puntos(pixeles_X, ancho_XventanaPatronDMD, pixeles_Y, ancho_YventanaPatronDMD) #calculo de la malla de puntos que muestrea la muestra
 
+espectro_imagen = 0
 
-''' simulacion de las imagnes que obtiene el microscopio '''
-filtro = opt.funcion_Rectangulo(0.4E-3, 25E-3, None, malla_XlenteAnteriorDemagnificador, malla_YlenteAnteriorDemagnificador)
-filtro = opt.invertir_Array(filtro)
+print(lista_imagenes)
 
+for iteracion in range(0, len(lista_imagenes) - 1):
+    angulo = angulo + 45
+    fourier = np.fft.fftshift(np.fft.fft2(lista_imagenes[iteracion]))
+    imagen_desplazadaMas = img.desplazar_imagen(fourier, -ancho_XventanaSpliterImagen/2, ancho_XventanaSpliterImagen/2, -ancho_YventanaSpliterImagen/2, ancho_YventanaSpliterImagen/2, lista_desplazamientos[iteracion], angulo)
+    imagen_desplazadaMenos = img.desplazar_imagen(fourier, -ancho_XventanaSpliterImagen/2, ancho_XventanaSpliterImagen/2, -ancho_YventanaSpliterImagen/2, ancho_YventanaSpliterImagen/2, -lista_desplazamientos[iteracion], angulo)
+    espectro_imagen = espectro_imagen + imagen_desplazadaMas + imagen_desplazadaMenos
+    #graph.intensidad_Logaritmica(espectro_imagen, ancho_XventanaSpliterImagen, ancho_YventanaSpliterImagen)
 
+#graph.intensidad_Logaritmica(espectro_imagen, ancho_XventanaSpliterImagen, ancho_YventanaSpliterImagen)
 
-
-''' sistema de iluminacion '''
-lado_ordenesDifraccion = 5.4E-6 #longitud del lado de los cuadrados que componen el patron de difraccion del dmd usando en el sistema de iluminacion
-posicion_primerOrden = 7E-3 #posicion de los primeros ordenes de difraccion 1 y -1 que genera el patron de difraccion del dmd, se usan para codificar la frecuencia del patron sinusoidal con el que se va a iluminar
-patron_DMD = opt.rejilla_difraccion(ancho_franjaEspejos*tamano_microespejo, malla_XpatronDMD, malla_YpatronDMD)
-campo_bloqueo = tlen.imagen_Sistema(propiedad_sistemaAnteriorIluminador, patron_DMD, ancho_XventanaLenteAnteriorDemagnificador, pixeles_X,  ancho_YventanaLenteAnteriorDemagnificador, pixeles_Y, longitud_Onda) * filtro
-campo_iluminadorDemagnificado = tlen.imagen_SistemaShift(propiedad_sistemaPosteriorIluminador, campo_bloqueo, ancho_XventanaPatronDemagnificado, pixeles_X,  ancho_YventanaPatronDemagnificado, pixeles_Y, longitud_Onda)
-campo_lenteFourier = tlen.imagen_SistemaShift(propiedad_sistemaTransformadaFourier, campo_iluminadorDemagnificado, ancho_XventanaSpliterIluminador, pixeles_X,  ancho_YventanaSpliterIluminador, pixeles_Y, longitud_Onda)
-campo_muestra = tlen.imagen_SistemaShift(propiedad_sistemaObjetivo, campo_lenteFourier, ancho_XventanaMuestra, pixeles_X,  ancho_YventanaMuestra, pixeles_Y, longitud_Onda)
-muestra = opt.img_to_array("images/USAF-1951.png")
-muestra = opt.resize_with_pad(muestra, [4000, 3000])
-muestra_iluminada = muestra * campo_muestra
-diafragma = opt.funcion_Circulo(diametro_Diafragma/2, None, malla_XspliterImagen, malla_YspliterImagen)
-campo_espectroMuestra = tlen.imagen_SistemaShift(propiedad_sistemaObjetivo, muestra_iluminada, ancho_XventanaSpliterImagen, pixeles_X,  ancho_YventanaSpliterImagen, pixeles_Y, longitud_Onda)
-espectro_pupila = campo_espectroMuestra * diafragma
-campo_sensor = tlen.imagen_SistemaShift(propiedad_sistemaLenteTubo, espectro_pupila, longitud_SensorX, pixeles_X,  longitud_SensorY, pixeles_Y, longitud_Onda)
-
-
-
-graph.intensidad(patron_DMD, ancho_XventanaPatronDMD, ancho_YventanaPatronDMD)
-graph.intensidad(campo_bloqueo, ancho_XventanaLenteAnteriorDemagnificador, ancho_YventanaLenteAnteriorDemagnificador, 0, 0.01)
-#graph.intensidad(campo_iluminadorDemagnificado, ancho_XventanaPatronDemagnificado, ancho_YventanaPatronDemagnificado)
-#graph.intensidad(campo_lenteFourier, ancho_XventanaSpliterIluminador, ancho_YventanaSpliterIluminador)
-graph.intensidad(campo_muestra, ancho_XventanaMuestra, ancho_YventanaMuestra)
-graph.intensidad(muestra_iluminada, ancho_XventanaMuestra, ancho_YventanaMuestra)
-graph.intensidad(campo_espectroMuestra, ancho_XventanaSpliterImagen, ancho_YventanaSpliterImagen, 0, 0.001)
-graph.intensidad(espectro_pupila, ancho_XventanaSpliterImagen, ancho_YventanaSpliterImagen, 0, 0.01)
-graph.intensidad(campo_sensor, longitud_SensorX, longitud_SensorY)
-
-
+imagen_reconstruida = np.fft.ifft2(espectro_imagen)
+graph.intensidad(imagen_reconstruida, longitud_SensorX, longitud_SensorY, 0, 0.1)
