@@ -509,4 +509,3 @@ def rejilla_difraccion(espejos, xx, yy, angulo = 90 ,opacidad_clara=1, opacidad_
     return mascara
    
 
-
