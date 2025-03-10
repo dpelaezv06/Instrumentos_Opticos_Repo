@@ -13,7 +13,7 @@ foco_objetivo = 50E-3 #distancia focal del objetivo de microscopio
 foco_lenteFourier = 150E-3
 foco_posteriorIluminador = 40E-3
 foco_anteriorIluminador = 100E-3
-diametro_Diafragma = 6.03022E-3 #diametro de la pupila del objetivo de microscopio
+diametro_Diafragma = 6.1E-3 #diametro de la pupila del objetivo de microscopio
 ancho_franjaEspejos = 8
 
 #calculo de las caracteristicas de cada sistema
@@ -72,7 +72,7 @@ malla_XpatronDMD, malla_YpatronDMD = opt.malla_Puntos(pixeles_X, ancho_XventanaP
 
 
 ''' simulacion de las imagnes que obtiene el microscopio '''
-filtro = opt.funcion_Rectangulo(0.4E-3, 25E-3, None, malla_XlenteAnteriorDemagnificador, malla_YlenteAnteriorDemagnificador)
+filtro = opt.funcion_Circulo(0.3E-3, None, malla_XlenteAnteriorDemagnificador, malla_YlenteAnteriorDemagnificador)
 filtro = opt.invertir_Array(filtro)
 tamano_fisicoDMD = opt.funcion_Rectangulo(10E-3, 6E-3, None, malla_XpatronDMD, malla_YpatronDMD)
 
@@ -80,8 +80,10 @@ tamano_fisicoDMD = opt.funcion_Rectangulo(10E-3, 6E-3, None, malla_XpatronDMD, m
 ''' sistema de iluminacion '''
 lado_ordenesDifraccion = 5.4E-6 #longitud del lado de los cuadrados que componen el patron de difraccion del dmd usando en el sistema de iluminacion
 posicion_primerOrden = 7E-3 #posicion de los primeros ordenes de difraccion 1 y -1 que genera el patron de difraccion del dmd, se usan para codificar la frecuencia del patron sinusoidal con el que se va a iluminar
-patron_DMD = opt.rejilla_difraccion(ancho_franjaEspejos, malla_XpatronDMD, malla_YpatronDMD, -45) * tamano_fisicoDMD
-campo_bloqueo = tlen.imagen_Sistema(propiedad_sistemaAnteriorIluminador, patron_DMD, ancho_XventanaLenteAnteriorDemagnificador, pixeles_X,  ancho_YventanaLenteAnteriorDemagnificador, pixeles_Y, longitud_Onda) * filtro
+patron_DMD = tamano_fisicoDMD
+#opt.rejilla_difraccion(ancho_franjaEspejos, malla_XpatronDMD, malla_YpatronDMD, 90) * tamano_fisicoDMD
+campo_bloqueo = tlen.imagen_Sistema(propiedad_sistemaAnteriorIluminador, patron_DMD, ancho_XventanaLenteAnteriorDemagnificador, pixeles_X,  ancho_YventanaLenteAnteriorDemagnificador, pixeles_Y, longitud_Onda)
+#* filtro
 campo_iluminadorDemagnificado = tlen.imagen_SistemaShift(propiedad_sistemaPosteriorIluminador, campo_bloqueo, ancho_XventanaPatronDemagnificado, pixeles_X,  ancho_YventanaPatronDemagnificado, pixeles_Y, longitud_Onda)
 campo_lenteFourier = tlen.imagen_SistemaShift(propiedad_sistemaTransformadaFourier, campo_iluminadorDemagnificado, ancho_XventanaSpliterIluminador, pixeles_X,  ancho_YventanaSpliterIluminador, pixeles_Y, longitud_Onda)
 campo_muestra = tlen.imagen_SistemaShift(propiedad_sistemaObjetivo, campo_lenteFourier, ancho_XventanaMuestra, pixeles_X,  ancho_YventanaMuestra, pixeles_Y, longitud_Onda)
@@ -95,15 +97,15 @@ campo_sensor = tlen.imagen_SistemaShift(propiedad_sistemaLenteTubo, espectro_pup
 modulo_cuadradoSensor = (np.abs(campo_sensor))**2
 
 
-graph.intensidad(patron_DMD, ancho_XventanaPatronDMD, ancho_YventanaPatronDMD)
-graph.intensidad(campo_bloqueo, ancho_XventanaLenteAnteriorDemagnificador, ancho_YventanaLenteAnteriorDemagnificador, 0, 0.01)
-graph.intensidad(campo_iluminadorDemagnificado, ancho_XventanaPatronDemagnificado, ancho_YventanaPatronDemagnificado)
-graph.intensidad(campo_lenteFourier, ancho_XventanaSpliterIluminador, ancho_YventanaSpliterIluminador)
-graph.intensidad(campo_muestra, ancho_XventanaMuestra, ancho_YventanaMuestra)
-graph.intensidad(muestra_iluminada, ancho_XventanaMuestra, ancho_YventanaMuestra)
-graph.intensidad(campo_espectroMuestra, ancho_XventanaSpliterImagen, ancho_YventanaSpliterImagen, 0, 0.001)
-graph.intensidad(espectro_pupila, ancho_XventanaSpliterImagen, ancho_YventanaSpliterImagen, 0, 0.01)
+#graph.intensidad(patron_DMD, ancho_XventanaPatronDMD, ancho_YventanaPatronDMD)
+#graph.intensidad(campo_bloqueo, ancho_XventanaLenteAnteriorDemagnificador, ancho_YventanaLenteAnteriorDemagnificador, 0, 0.01)
+#graph.intensidad(campo_iluminadorDemagnificado, ancho_XventanaPatronDemagnificado, ancho_YventanaPatronDemagnificado)
+#graph.intensidad(campo_lenteFourier, ancho_XventanaSpliterIluminador, ancho_YventanaSpliterIluminador)
+#graph.intensidad(campo_muestra, ancho_XventanaMuestra, ancho_YventanaMuestra)
+#graph.intensidad(muestra_iluminada, ancho_XventanaMuestra, ancho_YventanaMuestra)
+#graph.intensidad(campo_espectroMuestra, ancho_XventanaSpliterImagen, ancho_YventanaSpliterImagen, 0, 0.001)
+#graph.intensidad(espectro_pupila, ancho_XventanaSpliterImagen, ancho_YventanaSpliterImagen, 0, 0.01)
 graph.intensidad(campo_sensor, longitud_SensorX, longitud_SensorY)
 
 
-#plt.imsave('-45_8_simulado.png', modulo_cuadradoSensor, cmap = 'gray')
+plt.imsave('uniforme_simulado.png', modulo_cuadradoSensor, cmap = 'gray')
