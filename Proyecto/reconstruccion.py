@@ -91,22 +91,36 @@ espectro_imagen = 0
 
 angulo = -45
 
-pupila_sistetica = opt.funcion_Circulo(diametro_Diafragma/2, None, malla_XspliterImagen, malla_YspliterImagen)
+pupila_original = opt.funcion_Circulo(diametro_Diafragma/2, None, malla_XspliterImagen, malla_YspliterImagen)
+pupila_sistetica = pupila_original
 
 angulo = -45
+multiplo = 1.75
 for iteracion in range(0, len(lista_imagenes)):
     angulo = angulo + 45
     fourier = np.fft.fftshift(np.fft.fft2(lista_imagenes[iteracion]))
-    imagen_desplazadaMas = img.desplazar_imagen(fourier, -ancho_XventanaSpliterImagen/2, ancho_XventanaSpliterImagen/2, -ancho_YventanaSpliterImagen/2, ancho_YventanaSpliterImagen/2, lista_desplazamientos[iteracion], angulo + 90)
-    imagen_desplazadaMenos = img.desplazar_imagen(fourier, -ancho_XventanaSpliterImagen/2, ancho_XventanaSpliterImagen/2, -ancho_YventanaSpliterImagen/2, ancho_YventanaSpliterImagen/2, lista_desplazamientos[iteracion], angulo + 90)
-    espectro_imagen = espectro_imagen + imagen_desplazadaMas + imagen_desplazadaMenos
-    graph.intensidad_Logaritmica(fourier, ancho_XventanaSpliterImagen, ancho_YventanaSpliterImagen)
-    graph.intensidad_Logaritmica(imagen_desplazadaMas, ancho_XventanaSpliterImagen, ancho_YventanaSpliterImagen)
-    graph.intensidad_Logaritmica(imagen_desplazadaMenos, ancho_XventanaSpliterImagen, ancho_YventanaSpliterImagen)
-    graph.intensidad_Logaritmica(espectro_imagen, ancho_XventanaSpliterImagen, ancho_YventanaSpliterImagen)
-    
 
-espectro_imagen = espectro_imagen
+    pupila_sisteticaMas = img.desplazar_imagen(pupila_original, -ancho_XventanaSpliterImagen/2, ancho_XventanaSpliterImagen/2, -ancho_YventanaSpliterImagen/2, ancho_YventanaSpliterImagen/2, lista_desplazamientos[iteracion], angulo + 90)
+    pupila_sisteticaMenos = img.desplazar_imagen(pupila_original, -ancho_XventanaSpliterImagen/2, ancho_XventanaSpliterImagen/2, -ancho_YventanaSpliterImagen/2, ancho_YventanaSpliterImagen/2, -lista_desplazamientos[iteracion], angulo + 90)
+    imagen_desplazadaMas = img.desplazar_imagen(fourier*pupila_sisteticaMas, -ancho_XventanaSpliterImagen/2, ancho_XventanaSpliterImagen/2, -ancho_YventanaSpliterImagen/2, ancho_YventanaSpliterImagen/2, -multiplo*lista_desplazamientos[iteracion], angulo + 90)
+    imagen_desplazadaMenos = img.desplazar_imagen(fourier*pupila_sisteticaMenos, -ancho_XventanaSpliterImagen/2, ancho_XventanaSpliterImagen/2, -ancho_YventanaSpliterImagen/2, ancho_YventanaSpliterImagen/2, multiplo*lista_desplazamientos[iteracion], angulo + 90)
+    espectro_imagen = espectro_imagen + imagen_desplazadaMas + imagen_desplazadaMenos
+    #graph.intensidad_Logaritmica(fourier, ancho_XventanaSpliterImagen, ancho_YventanaSpliterImagen)
+    #graph.intensidad_Logaritmica(imagen_desplazadaMas, ancho_XventanaSpliterImagen, ancho_YventanaSpliterImagen)
+    #graph.intensidad_Logaritmica(imagen_desplazadaMenos, ancho_XventanaSpliterImagen, ancho_YventanaSpliterImagen)
+    #graph.intensidad_Logaritmica(espectro_imagen, ancho_XventanaSpliterImagen, ancho_YventanaSpliterImagen)
+
+angulo = 0
+pupila_original = opt.funcion_Circulo(diametro_Diafragma/2, None, malla_XspliterImagen, malla_YspliterImagen)
+for iteracion in range (0, len(lista_imagenes)):
+    angulo = angulo + 45
+    pupila_sistetica = pupila_sistetica | img.desplazar_imagen(pupila_original, -ancho_XventanaSpliterImagen/2, ancho_XventanaSpliterImagen/2, -ancho_YventanaSpliterImagen/2, ancho_YventanaSpliterImagen/2, lista_desplazamientos[iteracion], angulo)
+    pupila_sistetica = pupila_sistetica | img.desplazar_imagen(pupila_original, -ancho_XventanaSpliterImagen/2, ancho_XventanaSpliterImagen/2, -ancho_YventanaSpliterImagen/2, ancho_YventanaSpliterImagen/2, -lista_desplazamientos[iteracion], angulo)
+
+#graph.intensidad(pupila_original, ancho_XventanaSpliterImagen, ancho_YventanaSpliterImagen)
+#graph.intensidad(pupila_sistetica, ancho_XventanaSpliterImagen, ancho_YventanaSpliterImagen)
+
+
 graph.intensidad_Logaritmica(espectro_imagen, ancho_XventanaSpliterImagen, ancho_YventanaSpliterImagen)
 
 imagen_reconstruida = np.fft.ifft2(espectro_imagen)

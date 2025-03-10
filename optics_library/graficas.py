@@ -21,7 +21,7 @@ def intensidad(campo, ventanaX, ventanaY, min=0, max=1):
     plt.title("Mapa de Intensidad") #agregamos un titulo en el grafico
     plt.show() #mostramos el grafico
 
-def intensidad_Logaritmica(campo, ventanaX, ventanaY):
+def intensidad_Logaritmica(campo, ventanaX, ventanaY, vmin = 0, vmax = 1):
     ''' Grafica un patron de intensidad del campo ingresado en escala logaritmica 
     ENTRADAS:
     - campo: campo optico al que se le quiere representar su intensidad
@@ -35,7 +35,7 @@ def intensidad_Logaritmica(campo, ventanaX, ventanaY):
     intensidad_Logaritmica = np.log(1 + campo_Intensidad)
 
     ''' GRAFICAR '''
-    plt.imshow(intensidad_Logaritmica, extent = limites_eje, origin='lower', cmap='gray') #generamos la grafica
+    plt.imshow(intensidad_Logaritmica, extent = limites_eje, origin='lower', cmap='gray', vmin=vmin*np.max(intensidad_Logaritmica), vmax=vmax*np.max(intensidad_Logaritmica)) #generamos la grafica
     plt.colorbar(label="Intensidad") #agregamos la barra de color para representar la intensidad
     plt.xlabel("X (m)") #ponemos etiquetas en los ejes
     plt.ylabel("Y (m)") #ponemos etiquetas en los ejes
