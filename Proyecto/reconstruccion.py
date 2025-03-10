@@ -12,7 +12,7 @@ foco_lenteFourier = 150E-3
 foco_posteriorIluminador = 40E-3
 foco_anteriorIluminador = 100E-3
 diametro_Diafragma = 6.03022E-3 #diametro de la pupila del objetivo de microscopio
-ancho_franjaEspejos = 7
+ancho_franjaEspejos = 8
 angulo = -45
 pupila_sistetica = 0
 
@@ -25,10 +25,10 @@ desplazamiento_45 = img.desplazamiento_frecuencia(frecuencia, 45, foco_objetivo)
 desplazamiento_90 = img.desplazamiento_frecuencia(frecuencia, 90, foco_objetivo)
 desplazamiento_menos45 = img.desplazamiento_frecuencia(frecuencia, -45, foco_objetivo)
 
-imagen0 = opt.read_tiff('Proyecto/Images/0_grados_7_espejos.tiff')
-imagen45 = opt.read_tiff('Proyecto/Images/45_grados_7_espejo.tiff')
-imagen90 = opt.read_tiff('Proyecto/Images/90_grados_7_espejos.tiff')
-imagen_menos45 = opt.read_tiff('Proyecto/Images/-45_grados_7_espejos.tiff')
+imagen0 = opt.img_to_array('Proyecto/Images/0_8_simulado.png')
+imagen45 = opt.img_to_array('Proyecto/Images/45_8_simulado.png')
+imagen90 = opt.img_to_array('Proyecto/Images/90_8_simulado.png')
+imagen_menos45 = opt.img_to_array('Proyecto/Images/-45_8_simulado.png')
 
 lista_imagenes = [imagen0, imagen45, imagen90, imagen_menos45]
 lista_desplazamientos = [desplazamiento_0, desplazamiento_45, desplazamiento_90, desplazamiento_menos45]
@@ -92,19 +92,17 @@ espectro_imagen = 0
 angulo = -45
 
 pupila_sistetica = opt.funcion_Circulo(diametro_Diafragma/2, None, malla_XspliterImagen, malla_YspliterImagen)
-filtro = opt.funcion_Circulo(diametro_Diafragma/1000, None, malla_XspliterImagen, malla_YspliterImagen)
-filtro = opt.invertir_Array(filtro)
 
 angulo = -45
 for iteracion in range(0, len(lista_imagenes)):
     angulo = angulo + 45
-    fourier = np.fft.fftshift(np.fft.fft2(lista_imagenes[iteracion])) * (pupila_sistetica & filtro)
-    imagen_desplazadaMas = img.desplazar_imagen(fourier, -ancho_XventanaSpliterImagen/2, ancho_XventanaSpliterImagen/2, -ancho_YventanaSpliterImagen/2, ancho_YventanaSpliterImagen/2, -0.5*lista_desplazamientos[iteracion], angulo + 90)
-    imagen_desplazadaMenos = img.desplazar_imagen(fourier, -ancho_XventanaSpliterImagen/2, ancho_XventanaSpliterImagen/2, -ancho_YventanaSpliterImagen/2, ancho_YventanaSpliterImagen/2, 0.5*lista_desplazamientos[iteracion], angulo + 90)
+    fourier = np.fft.fftshift(np.fft.fft2(lista_imagenes[iteracion]))
+    imagen_desplazadaMas = img.desplazar_imagen(fourier, -ancho_XventanaSpliterImagen/2, ancho_XventanaSpliterImagen/2, -ancho_YventanaSpliterImagen/2, ancho_YventanaSpliterImagen/2, lista_desplazamientos[iteracion], angulo + 90)
+    imagen_desplazadaMenos = img.desplazar_imagen(fourier, -ancho_XventanaSpliterImagen/2, ancho_XventanaSpliterImagen/2, -ancho_YventanaSpliterImagen/2, ancho_YventanaSpliterImagen/2, lista_desplazamientos[iteracion], angulo + 90)
     espectro_imagen = espectro_imagen + imagen_desplazadaMas + imagen_desplazadaMenos
-    #graph.intensidad_Logaritmica(fourier, ancho_XventanaSpliterImagen, ancho_YventanaSpliterImagen)
-    #graph.intensidad_Logaritmica(imagen_desplazadaMas, ancho_XventanaSpliterImagen, ancho_YventanaSpliterImagen)
-    #graph.intensidad_Logaritmica(imagen_desplazadaMenos, ancho_XventanaSpliterImagen, ancho_YventanaSpliterImagen)
+    graph.intensidad_Logaritmica(fourier, ancho_XventanaSpliterImagen, ancho_YventanaSpliterImagen)
+    graph.intensidad_Logaritmica(imagen_desplazadaMas, ancho_XventanaSpliterImagen, ancho_YventanaSpliterImagen)
+    graph.intensidad_Logaritmica(imagen_desplazadaMenos, ancho_XventanaSpliterImagen, ancho_YventanaSpliterImagen)
     graph.intensidad_Logaritmica(espectro_imagen, ancho_XventanaSpliterImagen, ancho_YventanaSpliterImagen)
     
 
