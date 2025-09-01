@@ -121,7 +121,7 @@ for iteracion in range (0, len(lista_imagenes)):
 #graph.intensidad(pupila_sistetica, ancho_XventanaSpliterImagen, ancho_YventanaSpliterImagen)
 
 
-graph.intensidad(espectro_imagen, ancho_XventanaSpliterImagen, ancho_YventanaSpliterImagen)
+#graph.intensidad_Logaritmica(espectro_imagen, ancho_XventanaSpliterImagen, ancho_YventanaSpliterImagen)
 
 imagen_reconstruida = np.fft.ifft2(espectro_imagen)
-graph.intensidad(imagen_reconstruida, longitud_SensorX, longitud_SensorY)
+graph.intensidad(imagen_reconstruida, longitud_SensorX, longitud_SensorY, 0, 0.3)
